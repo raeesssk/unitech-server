@@ -73,7 +73,7 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
     }
 
     var singleInsert = 'INSERT INTO customer_master(cm_name, cm_mobile, cm_address, cm_state, cm_city, cm_pin_code, cm_credit, cm_debit, cm_email, cm_gst, cm_opening_credit, cm_opening_debit, cm_contact_person_name, cm_contact_person_number, cm_dept_name, cm_status) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,0) RETURNING *',
-        params = [req.body.cm_name,req.body.cm_mobile,req.body.cm_address,req.body.cm_state,req.body.cm_city,req.body.cm_pin_code,req.body.cm_credit,req.body.cm_debit,req.body.cm_email,req.body.cm_gst,req.body.cm_opening_credit,req.body.cm_opening_debit,req.body.cm_contact_person_name,req.body.cm_contact_person_number,req.body.cm_del_city,req.body.cm_dept_name]
+        params = [req.body.cm_name,req.body.cm_mobile,req.body.cm_address,req.body.cm_state,req.body.cm_city,req.body.cm_pin_code,req.body.cm_credit,req.body.cm_debit,req.body.cm_email,req.body.cm_gst,req.body.cm_credit,req.body.cm_debit,req.body.cm_contact_person_name,req.body.cm_contact_person_number,req.body.cm_dept_name]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         done();
