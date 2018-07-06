@@ -100,8 +100,8 @@ router.post('/edit/:custId', oauth.authorise(), (req, res, next) => {
     const credit = req.body.cm_credit - req.body.old_cm_credit;
     const debit = req.body.cm_debit - req.body.old_cm_debit;
 
-    var singleInsert = 'UPDATE customer_master SET cm_name=$1, cm_mobile=$2, cm_address=$3, cm_email=$4, cm_state=$5, cm_city=$6, cm_pin_code=$7, cm_credit= cm_credit + $8, cm_opening_credit=$9, cm_debit=cm_debit+$10, cm_opening_debit=$11, cm_gst_no=$12, cm_contact_person_name=$13, cm_contact_person_number=$14, cm_dept_name=$15, cm_updated_at=now() where cm_id=$16 RETURNING *',
-        params = [req.body.cm_name,req.body.cm_mobile,req.body.cm_address,req.body.cm_email,req.body.cm_state,req.body.cm_city,req.body.cm_pin_code,credit,req.body.cm_credit,debit,req.body.cm_debit,req.body.cm_gst_no,req.body.cm_contact_person_name,req.body.cm_contact_person_number,req.body.cm_dept_name,id]
+    var singleInsert = 'UPDATE customer_master SET cm_name=$1, cm_mobile=$2, cm_address=$3, cm_email=$4, cm_state=$5, cm_city=$6, cm_pin_code=$7, cm_credit= cm_credit + $8, cm_opening_credit=$9, cm_debit=cm_debit+$10, cm_opening_debit=$11, cm_gst=$12, cm_contact_person_name=$13, cm_contact_person_number=$14, cm_dept_name=$15, cm_updated_at=now() where cm_id=$16 RETURNING *',
+        params = [req.body.cm_name,req.body.cm_mobile,req.body.cm_address,req.body.cm_email,req.body.cm_state,req.body.cm_city,req.body.cm_pin_code,credit,req.body.cm_credit,debit,req.body.cm_debit,req.body.cm_gst,req.body.cm_contact_person_name,req.body.cm_contact_person_number,req.body.cm_dept_name,id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         done();
