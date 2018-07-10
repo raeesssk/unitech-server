@@ -28,7 +28,7 @@ router.get('/:empId', oauth.authorise(), (req, res, next) => {
                     "where emp.emp_status = 0 "+
                     "and emp.emp_id = $1";
 
-    const query = client.query(strqry,[str]);
+    const query = client.query(strqry,[id]);
     query.on('row', (row) => {
       results.push(row);
     });
