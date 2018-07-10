@@ -233,7 +233,7 @@ router.post('/employee/limit', oauth.authorise(), (req, res, next) => {
     // SQL Query > Select Data
 
     const strqry =  "SELECT emp.emp_id, emp.emp_name, emp.emp_mobile, emp.emp_designation, emp.emp_qualification, emp.emp_res_address, emp.emp_cor_address, emp.emp_aadhar, emp.emp_pan, emp.emp_bank_name, emp.emp_account_no, emp.emp_ifsc_code, emp.emp_branch, emp.emp_email, emp.emp_image, emp.emp_created_at, emp.emp_updated_at, emp.emp_status, emp.emp_birth_date, emp.emp_no "+
-                    "FROM employee_master cm "+
+                    "FROM employee_master emp "+
                     "where emp.emp_status = 0 "+
                     "and LOWER(emp_name||''||emp_mobile||''||emp_designation||''||emp_no ) LIKE LOWER($1) "+
                     "order by emp.emp_id desc LIMIT $2 OFFSET $3";
@@ -264,7 +264,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     // SQL Query > Select Data
 
     const strqry =  "SELECT emp_no||''||emp_name||''||emp_mobile as emp_search, emp.emp_id, emp.emp_name, emp.emp_mobile, emp.emp_designation, emp.emp_qualification, emp.emp_res_address, emp.emp_cor_address, emp.emp_aadhar, emp.emp_pan, emp.emp_bank_name, emp.emp_account_no, emp.emp_ifsc_code, emp.emp_branch, emp.emp_email, emp.emp_image, emp.emp_created_at, emp.emp_updated_at, emp.emp_status, emp.emp_birth_date, emp.emp_no "+
-                    "FROM employee_master cm "+
+                    "FROM employee_master emp "+
                     "where emp.emp_status = 0 "+
                     "and LOWER(emp_name||''||emp_mobile||''||emp_designation||''||emp_no ) LIKE LOWER($1) "+
                     "order by emp.emp_id desc LIMIT 16";
