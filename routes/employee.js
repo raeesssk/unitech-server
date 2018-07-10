@@ -138,7 +138,7 @@ router.post('/edit/:empId', oauth.authorise(), (req, res, next) => {
         console.log("the error is"+err);
         return res.status(500).json({success: false, data: err});
       }
-      var singleInsert = 'update employee_master set emp_name=$1, emp_mobile=$2, emp_designation=$3, emp_qualification=$4, emp_res_address=$5, emp_cor_address=$6, emp_aadhar=$7, emp_pan=$8, emp_bank_name=$9, emp_account_no=$10, emp_ifsc_code=$11, emp_branch=$12, emp_email=$13, emp_image=$14, emp_birth_date=$15, emp_no=$16, emp_updated_at=now() emp_id=$17 RETURNING *',
+      var singleInsert = 'update employee_master set emp_name=$1, emp_mobile=$2, emp_designation=$3, emp_qualification=$4, emp_res_address=$5, emp_cor_address=$6, emp_aadhar=$7, emp_pan=$8, emp_bank_name=$9, emp_account_no=$10, emp_ifsc_code=$11, emp_branch=$12, emp_email=$13, emp_image=$14, emp_birth_date=$15, emp_no=$16, emp_updated_at=now() where emp_id=$17 RETURNING *',
           params = [req.body.emp_name,req.body.emp_mobile,req.body.emp_designation,req.body.emp_qualification,req.body.emp_res_address,req.body.emp_cor_address,req.body.emp_aadhar,req.body.emp_pan,req.body.emp_bank_name,req.body.emp_account_no,req.body.emp_ifsc_code,req.body.emp_branch,req.body.emp_email,filenamestore,req.body.emp_birth_date,req.body.emp_no,id]
       client.query(singleInsert, params, function (error, result) {
           results.push(result.rows[0]); // Will contain your inserted rows
