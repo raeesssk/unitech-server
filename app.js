@@ -12,6 +12,7 @@ var cors = require('cors');
 var oauth = require('./oauth');
 var login = require('./routes/login');
 var customer = require('./routes/customer');
+var employee = require('./routes/employee');
 var product = require('./routes/product');
 var expense = require('./routes/expense');
 
@@ -54,6 +55,7 @@ app.use(app.oauth.errorHandler());
 // Define Routes Here
 app.use('/login', login);
 app.use('/customer', customer);
+app.use('/employee', employee);
 app.use('/product', product);
 app.use('/expense', expense);
 app.use('/invoice', invoice);
