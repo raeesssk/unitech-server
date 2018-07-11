@@ -17,8 +17,14 @@ router.get('/:mmId', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
+
+    const strqry =  "SELECT mm_name||''||mm_price as mm_search, mm.mm_id, mm.mm_name, mm.mm_price "+
+                    "FROM machine_master mm "+
+                    "where mm.mm_status = 0 "+
+                    "and mm.mm_id = $1";
+
     // SQL Query > Select Data
-    const query = client.query("SELECT cm_name||''||cm_address||''||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name FROM customer_master cm where cm.cm_id=$1",[id]);
+    const query = client.query(strqry,[id]);
     query.on('row', (row) => {
       results.push(row);
     });
@@ -44,7 +50,7 @@ router.post('/checkname', oauth.authorise(), (req, res, next) => {
     const strqry =  "SELECT mm_name||''||mm_price as mm_search, mm.mm_id, mm.mm_name, mm.mm_price "+
                     "FROM machine_master mm "+
                     "where mm.mm_status = 0 "+
-                    "and LOWER(cm.mm_name) like LOWER($1)";
+                    "and LOWER(mm.mm_name) like LOWER($1)";
 
     // SQL Query > Select Data
     const query = client.query(strqry,[req.body.mm_name]);
@@ -137,32 +143,7 @@ router.post('/delete/:mmId', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.get('/details/:vmId', oauth.authorise(), (req, res, next) => {
-  const results = [];
-  const id = req.params.vmId;
-  pool.connect(function(err, client, done){
-    if(err) {
-      done();
-      // pg.end();
-      console.log("the error is"+err);
-      return res.status(500).json({success: false, data: err});
-    }
-    const querystr =  "(select im.im_invoice_no as invoice,im.im_date as date,im.im_total_amount as debit,0 as credit,'Invoice' as type, '1' as num from invoice_master im LEFT OUTER JOIN customer_master cm on im.im_cm_id=cm.cm_id where im.im_status=0 and cm.cm_id = $1) UNION "+
-                      "(select ''||em.em_id as invoice,em.em_date as date,em.em_amount as debit,em.em_credit as credit,'Cashbook' as type, '2' as num from expense_master em LEFT OUTER JOIN customer_master vm on em.em_cm_id=vm.cm_id where vm.cm_id = $2) order by date,num asc";
-    const query = client.query(querystr,[id,id]);
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    query.on('end', () => {
-      done();
-      // pg.end();
-      return res.json(results);
-    });
-    done(err);
-  });
-});
-
-router.post('/customer/total', oauth.authorise(), (req, res, next) => {
+router.post('/machine/total', oauth.authorise(), (req, res, next) => {
   const results = [];
   pool.connect(function(err, client, done){
     if(err) {
@@ -173,10 +154,10 @@ router.post('/customer/total', oauth.authorise(), (req, res, next) => {
     }
     const str = req.body.search+"%";
 
-    const strqry =  "SELECT count(cm.cm_id) as total "+
-                    "from customer_master cm "+
-                    "where cm.cm_status=0 "+
-                    "and LOWER(cm_name||''||cm_address||''||cm_mobile||''||cm_gst ) LIKE LOWER($1);";
+    const strqry =  "SELECT count(mm.mm_id) as total "+
+                    "from machine_master mm "+
+                    "where mm.mm_status=0 "+
+                    "and LOWER(mm_name||''||mm_price ) LIKE LOWER($1);";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
@@ -203,11 +184,11 @@ router.post('/customer/limit', oauth.authorise(), (req, res, next) => {
     const str = req.body.search+"%";
     // SQL Query > Select Data
 
-    const strqry =  "SELECT cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
-                    "FROM CUSTOMER_MASTER cm "+
-                    "where cm.cm_status = 0 "+
-                    "and LOWER(cm_name||''||cm_address||''||cm_mobile||''||cm_gst ) LIKE LOWER($1) "+
-                    "order by cm.cm_id desc LIMIT $2 OFFSET $3";
+    const strqry =  "SELECT mm.mm_id, mm.mm_name, mm.mm_price, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
+                    "FROM machine_master mm "+
+                    "where mm.mm_status = 0 "+
+                    "and LOWER(mm_name||''||mm_price ) LIKE LOWER($1) "+
+                    "order by mm.mm_id desc LIMIT $2 OFFSET $3";
 
     const query = client.query(strqry,[str, req.body.number, req.body.begin]);
     query.on('row', (row) => {
@@ -234,11 +215,11 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     const str = req.body.search+"%";
     // SQL Query > Select Data
 
-    const strqry =  "SELECT cm_name||''||cm_address||''||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
-                    "FROM CUSTOMER_MASTER cm "+
-                    "where cm.cm_status = 0 "+
-                    "and LOWER(cm_name||' '||cm_address||' '||cm_mobile||' '||cm_gst ) LIKE LOWER($1) "+
-                    "order by cm.cm_id desc LIMIT 16";
+    const strqry =  "SELECT mm.mm_id, mm.mm_name, mm.mm_price, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
+                    "FROM machine_master mm "+
+                    "where mm.mm_status = 0 "+
+                    "and LOWER(mm_name||' '||mm_price ) LIKE LOWER($1) "+
+                    "order by mm.mm_id desc LIMIT 16";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
