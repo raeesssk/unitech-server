@@ -41,15 +41,13 @@ router.post('/checkname', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const strqry =  "SELECT cm_name||''||cm_address||''||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
-                    "FROM CUSTOMER_MASTER cm "+
-                    "where cm.cm_status = 0 "+
-                    "and LOWER(cm.cm_name) like LOWER($1)"+
-                    "and LOWER(cm.cm_mobile) like LOWER($2)"+
-                    "and LOWER(cm.cm_gst) like LOWER($3)";
+    const strqry =  "SELECT mm_name||''||mm_price as mm_search, mm.mm_id, mm.mm_name, mm.mm_price "+
+                    "FROM machine_master mm "+
+                    "where mm.mm_status = 0 "+
+                    "and LOWER(cm.mm_name) like LOWER($1)";
 
     // SQL Query > Select Data
-    const query = client.query(strqry,[req.body.cm_name,req.body.cm_mobile,req.body.cm_gst]);
+    const query = client.query(strqry,[req.body.mm_name]);
     query.on('row', (row) => {
       results.push(row);
     });
