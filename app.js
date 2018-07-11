@@ -13,6 +13,7 @@ var oauth = require('./oauth');
 var login = require('./routes/login');
 var customer = require('./routes/customer');
 var employee = require('./routes/employee');
+var machine = require('./routes/machine');
 var product = require('./routes/product');
 var expense = require('./routes/expense');
 
@@ -56,6 +57,7 @@ app.use(app.oauth.errorHandler());
 app.use('/login', login);
 app.use('/customer', customer);
 app.use('/employee', employee);
+app.use('/machine', machine);
 app.use('/product', product);
 app.use('/expense', expense);
 app.use('/invoice', invoice);
