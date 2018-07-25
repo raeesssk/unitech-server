@@ -27,6 +27,8 @@ var user = require('./routes/user');
 var sms = require('./routes/sms');
 var emailsent = require('./routes/emailsent');
 var backup = require('./routes/backup');
+var quotation= require('./routes/quotation');
+var design= require('./routes/design');
 
 
 var pmx = require('pmx').init({
@@ -72,6 +74,8 @@ app.use('/sms', sms);
 app.use('/emailsent', emailsent);
 app.use('/backup', backup);
 app.use('/user', user);
+app.use('/quotation', quotation);
+app.use('/design', design);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
