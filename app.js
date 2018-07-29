@@ -29,7 +29,7 @@ var emailsent = require('./routes/emailsent');
 var backup = require('./routes/backup');
 var quotation= require('./routes/quotation');
 var design= require('./routes/design');
-
+var bill= require('./routes/bill');
 
 var pmx = require('pmx').init({
   http          : true, // HTTP routes logging (default: true)
@@ -76,7 +76,7 @@ app.use('/backup', backup);
 app.use('/user', user);
 app.use('/quotation', quotation);
 app.use('/design', design);
-
+app.use('/bill', bill);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

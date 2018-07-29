@@ -131,6 +131,7 @@ router.post('/edit/:roleId', oauth.authorise(), (req, res, next) => {
   const id = req.params.roleId;
   const permission=req.body.permission;
   const role=req.body.role;
+  console.log(permission)
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -145,7 +146,8 @@ router.post('/edit/:roleId', oauth.authorise(), (req, res, next) => {
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         permission.forEach(function(value, key){
-          client.query("update role_permission_master set rpm_add=$1, rpm_edit=$2, rpm_delete=$3, rpm_list=$4 where rpm_rm_id=$5 RETURNING *",[value.pm_add1,value.pm_edit1,value.pm_delete1,value.pm_list1,result.rows[0].rm_id])
+          client.query("update role_permission_master set rpm_add=$1, rpm_edit=$2, rpm_delete=$3, rpm_list=$4 where rpm_rm_id=$5 RETURNING *",
+            [value.pm_add1,value.pm_edit1,value.pm_delete1,value.pm_list1,result.rows[0].rm_id])
         });
         client.query('COMMIT;');
         done();

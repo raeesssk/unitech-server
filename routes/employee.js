@@ -292,4 +292,28 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
   });
 });
 
+
+router.get('/view/:empId', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  const id=req.params.empId;
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const query = client.query("SELECT * FROM user_master um left outer join employee_master em on um.um_emp_id=em.emp_id where um_id=$1",[id]);
+    query.on('row', (row) => {
+      results.push(row);
+
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+  done(err);
+  });
+});
 module.exports = router;
