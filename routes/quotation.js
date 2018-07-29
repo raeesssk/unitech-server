@@ -7,6 +7,27 @@ var config = require('../config.js');
 
 var pool = new pg.Pool(config);
 
+router.get('/', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const query = client.query("SELECT * FROM quotation_product_master qtm LEFT OUTER JOIN design_product_master dtm on qtm.qtm_dtm_id = dtm.dtm_id order by qtm_id desc");
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
 
 
 router.post('/add', oauth.authorise(), (req, res, next) => {
@@ -53,7 +74,7 @@ router.get('/:quotationId', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const query = client.query('SELECT * FROM quatation_master qm inner join customer_master cm on qm.qm_cm_id=cm.cm_id left outer join quotation_product_master qtm on qtm.qtm_qm_id=qm.qm_id where qm_id=$1',[id]);
+    const query = client.query('SELECT * FROM quatation_master qm inner join customer_master cm on qm.qm_cm_id=cm.cm_id left outer join quotation_product_master qtm on qtm.qtm_qm_id=qm.qm_id left outer join design_product_master dtm on qtm.qtm_dtm_id=dtm.dtm_id where qm_id=$1',[id]);
     query.on('row', (row) => {
       results.push(row);
     });
