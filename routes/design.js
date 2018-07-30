@@ -96,7 +96,6 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
   const oldDetails=req.body.oldDetails;
   const personalDetails=req.body.personalDetails;
   const removeDetails=req.body.removeDetails;
-  console.log(removeDetails);
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -111,9 +110,9 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
     client.query(designInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
-        /*removeDetails.forEach(function(product, index) {
+        removeDetails.forEach(function(product, index) {
           client.query('delete from public.design_product_master where dtm_id=$1',[product.dtm_id]);
-        });*/
+        });
 
         oldDetails.forEach(function(product, index) {
           client.query('update design_product_master set dtm_part_no=$1, dtm_part_name=$2, dtm_qty=$3, dtm_dm_id=$4, dtm_updated_at=now() where dtm_id=$5',[product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id,product.dtm_id]);
