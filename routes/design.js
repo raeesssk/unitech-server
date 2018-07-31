@@ -110,7 +110,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
     client.query(designInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
-        removeDetails.forEach(function(product, index) {
+          removeDetails.forEach(function(product, index) {
           client.query('delete from public.design_product_master where dtm_id=$1',[product.dtm_id]);
         });
 
@@ -123,7 +123,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
           [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
         //client.query('update design_product_master set dtm_part_no=$1, dtm_part_name=$2, dtm_qty=$3, dtm_updated_at=now() where dtm_id=$4',[product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
         });
-
+      
         client.query('COMMIT;');
         done();
         return res.json(results);

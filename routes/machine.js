@@ -212,7 +212,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     const str = req.body.search+"%";
     // SQL Query > Select Data
 
-    const strqry =  "SELECT  mm_name||''||mm_price as mm_search, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
+    const strqry =  "SELECT  mm_name||''||mm_price as mm_search,mm.mm_name, mm.mm_price, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
                     "FROM machine_master mm "+
                     "where mm.mm_status = 0 "+
                     "and LOWER(mm_name||' '||mm_price ) LIKE LOWER($1) "+

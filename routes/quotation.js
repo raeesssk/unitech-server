@@ -55,9 +55,8 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
         });
 
         machineDetails.forEach(function(value,key){
-          client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qm_id, qpmm_mm_hr, qpmm_status)VALUES ($1, $2, $3, 0)",
-            [value.qpmm_mm_id.mm_id, result.rows[0].qm_id, value.qpmm_mm_hr]);
-          client.query("update quatation_master set qm_qpmm_id=$1 where qm_id=$2",[value.qpmm_mm_id.mm_id,result.rows[0].qm_id]);
+          client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qm_id, qpmm_mm_hr, qpmm_total_cost, qpmm_status)VALUES ($1, $2, $3, $4, 0)",
+            [value.qpmm_mm_id.mm_id, result.rows[0].qm_id, value.qpmm_mm_hr, value.qpmm_total]);
         });
 
         done();
@@ -140,39 +139,17 @@ router.get('/machine/:quotationId', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
-  const results = [];
-  const id = req.params.quotationId;
-  pool.connect(function(err, client, done){
-    if(err) {
-      done();
-      // pg.end();
-      console.log("the error is"+err);
-      return res.status(500).json({success: false, data: err});
-    }
-    client.query('BEGIN;');
-    
-    var singleInsert = 'update quatation_master set qm_design_no=$1, qm_quotation_no=$2, qm_cm_id=$3, qm_date=$4, qm_ref_no=$5, qm_updated_at=now() where qm_id=$6 RETURNING *',
-        params = [req.body.qm_design_no.dm_design_no,req.body.qm_quotation_no,req.body.qm_cm_id.cm_id,req.body.qm_date,req.body.qm_ref_no,id];
-    client.query(singleInsert, params, function (error, result) {
-        results.push(result.rows[0]); // Will contain your inserted rows
-        
-        client.query('COMMIT;');
-        done();
-        return res.json(results);
-    });
-
-    done(err);
-  });
-});
 
 router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
   const results = [];
   const id = req.params.quotationId;
   const quotation=req.body.quotation;
-  const oldDetails=req.body.oldDetails;
   const personalDetails=req.body.personalDetails;
-  // const removeDetails=req.body.removeDetails;
+  const machineDetails = req.body.machineDetails;
+  const oldProductDetails = req.body.oldProductDetails;
+  const removeProductDetails = req.body.removeProductDetails;
+  const oldMachineDetails = req.body.oldMachineDetails;
+  const removeMachineDetails = req.body.removeMachineDetails;
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -182,25 +159,42 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
     
-    var singleInsert = 'update quatation_master set qm_design_no=$1, qm_quotation_no=$2, qm_cm_id=$3, qm_date=$4, qm_ref_no=$5, qm_updated_at=now() where qm_id=$6 RETURNING *',
-        params = [quotation.qm_design_no.dm_design_no,quotation.qm_quotation_no,quotation.qm_cm_id.cm_id,quotation.qm_date,quotation.qm_ref_no,id];
+    var singleInsert = 'update quatation_master set  qm_ref_no=$1, qm_updated_at=now() where qm_id=$2 RETURNING *',
+        params = [quotation.qm_ref_no,id];
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
-        // remove.forEach(function(product, index) {
-        //   client.query('delete from public.quotation_product_master where qtm_id=$1',[product.qtm_id]);
-        // });
+        removeProductDetails.forEach(function(product, index) {
+          client.query('delete from quotation_product_master where qpm_id=$1',[product.qpm_id]);
+        });
 
-        oldDetails.forEach(function(product, index) {
-          client.query('update quotation_product_master set qtm_part_no=$1, qtm_part_name=$2, qtm_qty=$3, qtm_cost=$4, qtm_total=$5, qtm_qm_id=$6, qtm_updated_at=now() where qtm_id=$7',
-          	[product.qtm_part_no,product.qtm_part_name,product.qtm_qty,product.qtm_cost,product.qtm_total,result.rows[0].qm_id,product.qtm_id]);
+        oldProductDetails.forEach(function(val, index) {
+          client.query('update quotation_product_master set qpm_part_np=$1, qpm_part_name=$2, qpm_qty=$3, qpm_qm_id=$4, qpm_updated_at=now() where qpm_id=$5',
+          	[val.qpm_part_np,val.qpm_part_name,val.qpm_qty,result.rows[0].qm_id,val.qpm_id]);
         });
 
         personalDetails.forEach(function(product, index) {
-        client.query('INSERT INTO quotation_product_master(qtm_part_no, qtm_part_name, qtm_qty, qtm_cost, qtm_total, qtm_qm_id, qtm_status)VALUES ($1, $2, $3, $4, $5, $6  0)',
-          [product.qtm_part_no,product.qtm_part_name,product.qtm_qty,product.qtm_cost,product.qtm_total,result.rows[0].qm_id]);
+        client.query('INSERT INTO quotation_product_master(qpm_part_no, qpm_part_name, qpm_qty, qpm_qm_id, qpm_status)VALUES ($1, $2, $3, $4, 0)',
+          [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].qm_id]);
         });
 
+        removeMachineDetails.forEach(function(product, index) {
+          client.query('delete from public.quotation_product_machine_master where qpmm_id=$1',[product.qpmm_id]);
+        });
+        
+        oldMachineDetails.forEach(function(product, index) {
+          client.query('update quotation_product_machine_master set qpmm_mm_id=$1, qpmm_mm_hr=$2, qpmm_qm_id=$3, qpmm_total_cost=$4, qpmm_updated_at=now() where qpmm_id=$5',
+            [product.mm_search.mm_search, product.qpmm_mm_hr, result.rows[0].qm_id, product.qpmm_total, product.qpmm_id]);
+          client.quer("update quatation_master set qm_total_cost=$1 where qm_id=$2",[result.rows[0].qm_total_cost,result.rows[0].qm_id]);
+        });
+        
+        machineDetails.forEach(function(value, index) {
+        client.query('INSERT INTO quotation_product_machine_master(qpmm_mm_id, qpmm_qm_id, qpmm_mm_hr, qpmm_total_cost, qpmm_status)VALUES ($1, $2, $3, $4, 0)',
+          [value.qpmm_mm_id.mm_id, result.rows[0].qm_id, value.qpmm_mm_hr, value.qpmm_total]);
+        client.quer("update quatation_master set qm_total_cost=$1 where qm_id=$2",[result.rows[0].qm_total_cost,result.rows[0].qm_id]);
+        });
+        
+        console.log(results);
         client.query('COMMIT;');
         done();
         return res.json(results);
@@ -331,6 +325,30 @@ router.get('/view/:quotationId', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
     const query = client.query("SELECT * FROM quotation_product_master qpm inner join quatation_master qm on qpm.qpm_qm_id=qm.qm_id where qm_id=$1",[id]);
+    query.on('row', (row) => {
+      results.push(row);
+
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+  done(err);
+  });
+});
+
+router.get('/machine/:quotationId', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  const id=req.params.quotationId;
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const query = client.query("SELECT * FROM quotation_product_machine_master qpmm inner join quatation_master qm on qpmm.qpmm_qm_id=qm.qm_id LEFT OUTER JOIN machine_master mm on qpmm.qpmm_mm_id=mm.mm_id where qm_id=$1",[id]);
     query.on('row', (row) => {
       results.push(row);
 
