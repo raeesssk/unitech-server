@@ -198,11 +198,10 @@ router.post('/user/limit', oauth.authorise(), (req, res, next) => {
 
     const strqry =  "SELECT * "+
                     "FROM user_master um "+
-                    "inner join employee_master emp on um.um_emp_id=emp.emp_id "+
+                    "left outer join employee_master emp on um.um_emp_id=emp.emp_id "+
                     "left outer join role_master rm on um.um_rm_id=rm.rm_id "+
                     "left outer join users u on um.um_users_id=u.id "+
                     "where um.um_status = 0 "+
-                    "and emp.emp_status = 0 "+
                     "and LOWER(username||''||emp_name||''||rm_name) LIKE LOWER($1) "+
                     "order by um.um_id desc LIMIT $2 OFFSET $3";
 
