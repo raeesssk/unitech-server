@@ -82,7 +82,7 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
       },
       filename: function (req, file, callback) {
           var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
-          filenamestore = "../images/"+fi;
+          filenamestore = "../unitech/resources/img/"+fi;
           callback(null, fi);
       }
   });
@@ -121,7 +121,7 @@ router.post('/edit/:empId', oauth.authorise(), (req, res, next) => {
       },
       filename: function (req, file, callback) {
           var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
-          filenamestore = "../images/"+fi;
+          filenamestore = "../unitech/resources/img/"+fi;
           callback(null, fi);
       }
   });
@@ -167,6 +167,8 @@ router.post('/delete/:empId', oauth.authorise(), (req, res, next) => {
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
+        console.log(results);
+        client.query('delete from users where first_name=$1',[result.rows[0].emp_name]);
         done();
         client.query('COMMIT;');
         return res.json(results);

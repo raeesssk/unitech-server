@@ -43,8 +43,8 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    var singleInsert = 'INSERT INTO quatation_master(qm_design_no, qm_quotation_no, qm_cm_id, qm_date, qm_ref_no, qm_status) values($1,$2,$3,$4,$5,0) RETURNING *',
-        params = [quotation.qm_design_no.dm_design_no,quotation.qm_quotation_no,quotation.qm_design_no.dm_cm_id,quotation.qm_design_no.dm_dely_date,quotation.qm_ref_no];
+    var singleInsert = 'INSERT INTO quatation_master(qm_design_no, qm_quotation_no, qm_cm_id, qm_date, qm_ref_no, qm_total_cost, qm_status) values($1,$2,$3,$4,$5,$6,0) RETURNING *',
+        params = [quotation.qm_design_no.dm_design_no,quotation.qm_quotation_no,quotation.qm_design_no.dm_cm_id,quotation.qm_design_no.dm_dely_date,quotation.qm_ref_no,quotation.qm_total_cost];
     client.query(singleInsert, params, function (error, result) {
       
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -149,6 +149,7 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
   const oldProductDetails = req.body.oldProductDetails;
   const removeProductDetails = req.body.removeProductDetails;
   const oldMachineDetails = req.body.oldMachineDetails;
+  console.log(quotation);
   const removeMachineDetails = req.body.removeMachineDetails;
   pool.connect(function(err, client, done){
     if(err) {
@@ -159,8 +160,8 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
     
-    var singleInsert = 'update quatation_master set  qm_ref_no=$1, qm_updated_at=now() where qm_id=$2 RETURNING *',
-        params = [quotation.qm_ref_no,id];
+    var singleInsert = 'update quatation_master set  qm_ref_no=$1,qm_total_cost=$2, qm_updated_at=now() where qm_id=$3 RETURNING *',
+        params = [quotation.qm_ref_no,quotation.qm_total_cost,id];
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
@@ -184,14 +185,12 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
         
         oldMachineDetails.forEach(function(product, index) {
           client.query('update quotation_product_machine_master set qpmm_mm_id=$1, qpmm_mm_hr=$2, qpmm_qm_id=$3, qpmm_total_cost=$4, qpmm_updated_at=now() where qpmm_id=$5',
-            [product.mm_search.mm_search, product.qpmm_mm_hr, result.rows[0].qm_id, product.qpmm_total, product.qpmm_id]);
-          client.quer("update quatation_master set qm_total_cost=$1 where qm_id=$2",[result.rows[0].qm_total_cost,result.rows[0].qm_id]);
+            [product.qpmm_mm_id, product.qpmm_mm_hr, result.rows[0].qm_id, product.qpmm_total_cost, product.qpmm_id]);
         });
         
         machineDetails.forEach(function(value, index) {
         client.query('INSERT INTO quotation_product_machine_master(qpmm_mm_id, qpmm_qm_id, qpmm_mm_hr, qpmm_total_cost, qpmm_status)VALUES ($1, $2, $3, $4, 0)',
-          [value.qpmm_mm_id.mm_id, result.rows[0].qm_id, value.qpmm_mm_hr, value.qpmm_total]);
-        client.quer("update quatation_master set qm_total_cost=$1 where qm_id=$2",[result.rows[0].qm_total_cost,result.rows[0].qm_id]);
+          [value.qpmm_mm_id.mm_id, result.rows[0].qm_id, value.qpmm_mm_hr, value.qpmm_total_cost]);
         });
         
         console.log(results);

@@ -131,7 +131,6 @@ router.post('/edit/:roleId', oauth.authorise(), (req, res, next) => {
   const id = req.params.roleId;
   const permission=req.body.permission;
   const role=req.body.role;
-  console.log(permission)
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -145,11 +144,12 @@ router.post('/edit/:roleId', oauth.authorise(), (req, res, next) => {
         params = [role.rm_name,role.rm_description,id];
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
+        
         permission.forEach(function(value, key){
           client.query("update role_permission_master set rpm_add=$1, rpm_edit=$2, rpm_delete=$3, rpm_list=$4 where rpm_rm_id=$5 RETURNING *",
-            [value.pm_add1,value.pm_edit1,value.pm_delete1,value.pm_list1,result.rows[0].rm_id])
+            [value.pm_add1, value.pm_edit1, value.pm_delete1, value.pm_list1, result.rows[0].rm_id]);
         });
-        client.query('COMMIT;');
+
         done();
         return res.json(results);
     });
@@ -275,33 +275,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.post('/permission/edit:permId', oauth.authorise(), (req, res, next) => {
-  const results = [];
-  const role=req.body.role;
-  const permission=req.body.permission;
-  pool.connect(function(err, client, done){
-    if(err) {
-      done();
-      // pg.end();
-      console.log("the error is"+err);
-      return res.status(500).json({success: false, data: err});
-    }
 
-    var singleInsert = "INSERT INTO role_master(rm_name, rm_description, rm_status) values($1,$2,0) RETURNING *",
-        params = [role.rm_name,role.rm_description]
-    client.query(singleInsert, params, function (error, result) {
-        results.push(result.rows[0]); // Will contain your inserted rows
-        permission.forEach(function(value, key){
-          client.query('INSERT into role_permission_master(rpm_rm_id,rpm_pm_id,rpm_add,rpm_edit,rpm_delete,rpm_list) values($1,$2,$3,$4,$5,$6) RETURNING *',
-            [result.rows[0].rm_id,value.pm_id,value.pm_add1,value.pm_edit1,value.pm_delete1,value.pm_list1]);
-        });
-        done();
-        return res.json(results);
-    });
-
-    done(err);
-  });
-});
 
 
 
