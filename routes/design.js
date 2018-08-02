@@ -254,9 +254,10 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     }
     const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
-
+    
     const strqry =  "SELECT * "+
                     "FROM design_master dm "+
+                    "left outer join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where dm.dm_status = 0 "+
                     "and LOWER(dm_design_no||''||dm_project_no) LIKE LOWER($1) "+
                     "order by dm.dm_id desc LIMIT 10";

@@ -149,7 +149,6 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
   const oldProductDetails = req.body.oldProductDetails;
   const removeProductDetails = req.body.removeProductDetails;
   const oldMachineDetails = req.body.oldMachineDetails;
-  console.log(quotation);
   const removeMachineDetails = req.body.removeMachineDetails;
   pool.connect(function(err, client, done){
     if(err) {

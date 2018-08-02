@@ -66,12 +66,14 @@ router.post('/isonline', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
     // // SQL Query > Select Data
+    
     client.query('update users set is_online=1, last_login=now() where username=$1',[req.body.username]);
     const query = client.query('SELECT username,first_name,icon_image FROM users where username=$1',[req.body.username]);
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
     });
+  
     // After all data is returned, close connection and return results
     query.on('end', () => {
       done();

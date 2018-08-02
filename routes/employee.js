@@ -167,8 +167,7 @@ router.post('/delete/:empId', oauth.authorise(), (req, res, next) => {
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
-        console.log(results);
-        client.query('delete from users where first_name=$1',[result.rows[0].emp_name]);
+        client.query('update users set flag=1 where first_name=$1',[result.rows[0].emp_name]);
         done();
         client.query('COMMIT;');
         return res.json(results);

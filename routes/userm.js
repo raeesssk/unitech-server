@@ -85,7 +85,7 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    var singleInsert = "INSERT INTO users(username,password,first_name,icon_image,is_online) values($1,$2,$3,$4,0) RETURNING *",
+    var singleInsert = "INSERT INTO users(username,password,first_name,icon_image,is_online,flag) values($1,$2,$3,$4,0,0) RETURNING *",
         params = [req.body.um_username,req.body.um_password,req.body.um_emp_id.emp_name,req.body.um_emp_id.emp_image]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -101,7 +101,6 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
 
 router.post('/edit/:usermId', oauth.authorise(), (req, res, next) => {
   const results = [];
-  console.log(req.body);
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -142,6 +141,7 @@ router.post('/delete/:usermId', oauth.authorise(), (req, res, next) => {
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
        done();
+       client.query("update users set flag=1, updated_at=now() where id=$1",[result.rows[0].um_users_id]);
         client.query('COMMIT;');
         return res.json(results);
     });
@@ -162,14 +162,13 @@ router.post('/user/total', oauth.authorise(), (req, res, next) => {
     const str = "%"+req.body.search+"%";
 
     console.log(str);
-    const strqry =  "SELECT count(um.um_id) as total "+
-                    "from user_master um "+
-                    "inner join employee_master emp on um.um_emp_id=emp.emp_id "+
+    const strqry =  "SELECT count(id) as total "+
+                    "from users u "+
+                    "left outer join user_master um on um.um_users_id=u.id "+
+                    "left outer join employee_master emp on um.um_emp_id=emp.emp_id "+
                     "left outer join role_master rm on um.um_rm_id=rm.rm_id "+
-                    "left outer join users u on um.um_users_id=u.id "+
-                    "where um.um_status = 0 "+
-                    "and emp.emp_status = 0 "+
-                    "and LOWER(username||''||emp_name||''||rm_name) LIKE LOWER($1);";
+                    "where u.flag=0 "+
+                    "and LOWER(username||''||first_name) LIKE LOWER($1);";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
@@ -197,13 +196,13 @@ router.post('/user/limit', oauth.authorise(), (req, res, next) => {
     // SQL Query > Select Data
 
     const strqry =  "SELECT * "+
-                    "FROM user_master um "+
+                    "FROM users u "+
+                    "left outer join user_master um on um.um_users_id=u.id "+
                     "left outer join employee_master emp on um.um_emp_id=emp.emp_id "+
                     "left outer join role_master rm on um.um_rm_id=rm.rm_id "+
-                    "left outer join users u on um.um_users_id=u.id "+
-                    "where um.um_status = 0 "+
-                    "and LOWER(username||''||emp_name||''||rm_name) LIKE LOWER($1) "+
-                    "order by um.um_id desc LIMIT $2 OFFSET $3";
+                    "where u.flag=0 "+
+                    "and LOWER(username||''||first_name) LIKE LOWER($1) "+
+                    "order by u.id desc LIMIT $2 OFFSET $3";
 
     const query = client.query(strqry,[ str, req.body.number, req.body.begin]);
     query.on('row', (row) => {
@@ -218,27 +217,6 @@ router.post('/user/limit', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.get('/view/:usermId', oauth.authorise(), (req, res, next) => {
-  const results = [];
-  const id=req.params.usermId;
-  pool.connect(function(err, client, done){
-    if(err) {
-      done();
-      // pg.end();
-      console.log("the error is"+err);
-      return res.status(500).json({success: false, data: err});
-    }
-    const query = client.query("SELECT * FROM user_master um left outer join employee_master em on um.um_emp_id=em.emp_id where um_id=$1",[id]);
-    query.on('row', (row) => {
-      results.push(row);
 
-    });
-    query.on('end', () => {
-      done();
-      // pg.end();
-      return res.json(results);
-    });
-  done(err);
-  });
-});
+
 module.exports = router;
