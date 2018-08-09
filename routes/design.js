@@ -5,6 +5,10 @@ var pg = require('pg');
 var path = require('path');
 var config = require('../config.js');
 
+var multer = require('multer'); 
+
+var filenamestore = "";
+
 var pool = new pg.Pool(config);
 
 
@@ -30,8 +34,6 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
       purchaseMultipleData.forEach(function(product, index) {
         client.query('INSERT INTO design_product_master(dtm_part_no, dtm_part_name, dtm_qty, dtm_dm_id, dtm_status)VALUES ($1, $2, $3, $4,  0)',
           [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
-        
-          
       });
 
       // client.query('COMMIT;');
@@ -40,6 +42,45 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
     });
   done(err);
   });
+});
+
+router.post('/image/add', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  console.log(req.body);
+  var Storage = multer.diskStorage({
+      destination: function (req, file, callback) {
+          // callback(null, "./images");
+            callback(null, "../unitech/resources/img");
+      },
+      filename: function (req, file, callback) {
+          var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
+          filenamestore = "../unitech/resources/img/"+fi;
+          callback(null, fi);
+      }
+  });
+
+  var upload = multer({ storage: Storage }).array("dm_image"); 
+
+  upload(req, res, function (err) { 
+    if (err) { 
+        return res.end("Something went wrong!"+err); 
+    } 
+    pool.connect(function(err, client, done){
+      if(err) {
+        done();
+        console.log("the error is"+err);
+        return res.status(500).json({success: false, data: err});
+      }
+      var singleInsert = 'INSERT INTO design_image_master(dim_image) values($1) RETURNING *',
+          params = [filenamestore]
+      client.query(singleInsert, params, function (error, result) {
+          results.push(result.rows[0]); // Will contain your inserted rows
+          done();
+          return res.json(results);
+      });
+      done(err);
+    });
+  }); 
 });
 
 router.get('/:designId', oauth.authorise(), (req, res, next) => {
