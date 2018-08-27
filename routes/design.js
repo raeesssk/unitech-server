@@ -46,15 +46,15 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
 
 router.post('/image/add', oauth.authorise(), (req, res, next) => {
   const results = [];
-  console.log(req.body);
+
   var Storage = multer.diskStorage({
       destination: function (req, file, callback) {
-          // callback(null, "./images");
-            callback(null, "../unitech/resources/img");
+          callback(null, "./images");
+            // callback(null, "../unitech/resources/img");
       },
       filename: function (req, file, callback) {
           var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
-          filenamestore = "../unitech/resources/img/"+fi;
+          filenamestore = "./images"+fi;
           callback(null, fi);
       }
   });
@@ -71,8 +71,8 @@ router.post('/image/add', oauth.authorise(), (req, res, next) => {
         console.log("the error is"+err);
         return res.status(500).json({success: false, data: err});
       }
-      var singleInsert = 'INSERT INTO design_image_master(dim_image) values($1) RETURNING *',
-          params = [filenamestore]
+      var singleInsert = 'INSERT INTO design_image_master(dim_dm_id,dim_image) values($1,$2) RETURNING *',
+          params = [req.body.dim_dm_id, filenamestore]
       client.query(singleInsert, params, function (error, result) {
           results.push(result.rows[0]); // Will contain your inserted rows
           done();
@@ -298,7 +298,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     
     const strqry =  "SELECT * "+
                     "FROM design_master dm "+
-                    "left outer join customer_master cm on dm.dm_cm_id=cm.cm_id "+
+                    "join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where dm.dm_status = 0 "+
                     "and LOWER(dm_design_no||''||dm_project_no) LIKE LOWER($1) "+
                     "order by dm.dm_id desc LIMIT 10";
