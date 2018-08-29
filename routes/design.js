@@ -3,6 +3,7 @@ var router = express.Router();
 var oauth = require('../oauth/index');
 var pg = require('pg');
 var path = require('path');
+const cmd = require('node-cmd');
 var config = require('../config.js');
 
 var multer = require('multer'); 
@@ -178,6 +179,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
   const oldDetails=req.body.oldDetails;
   const personalDetails=req.body.personalDetails;
   const removeDetails=req.body.removeDetails;
+  const removeImagesDetails=req.body.removeImagesDetails;
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -192,7 +194,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
     client.query(designInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
-          removeDetails.forEach(function(product, index) {
+        removeDetails.forEach(function(product, index) {
           client.query('delete from public.design_product_master where dtm_id=$1',[product.dtm_id]);
         });
 
@@ -204,6 +206,14 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
         client.query('INSERT INTO design_product_master(dtm_part_no, dtm_part_name, dtm_qty, dtm_dm_id, dtm_status)VALUES ($1, $2, $3, $4,  0)',
           [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
         //client.query('update design_product_master set dtm_part_no=$1, dtm_part_name=$2, dtm_qty=$3, dtm_updated_at=now() where dtm_id=$4',[product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
+        });
+
+        removeDetails.forEach(function(product, index) {
+          const fin = product.dim_image;
+          const finyr = fin.split('/');
+          const finyr2 = finyr[2];
+          cmd.run('rm /usr/share/nginx/html/images/'+finyr2);
+          client.query('delete from public.design_image_master where dim_id=$1',[product.dim_id]);
         });
       
         client.query('COMMIT;');
