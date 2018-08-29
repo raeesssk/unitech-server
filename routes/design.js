@@ -208,7 +208,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
         //client.query('update design_product_master set dtm_part_no=$1, dtm_part_name=$2, dtm_qty=$3, dtm_updated_at=now() where dtm_id=$4',[product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
         });
 
-        removeDetails.forEach(function(product, index) {
+        removeImagesDetails.forEach(function(product, index) {
           const fin = product.dim_image;
           const finyr = fin.split('/');
           const finyr2 = finyr[2];
