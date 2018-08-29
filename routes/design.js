@@ -287,8 +287,7 @@ router.post('/design/total', oauth.authorise(), (req, res, next) => {
     const strqry =  "SELECT count(dm_id) as total "+
                     "from design_master dm "+
                     "left outer join customer_master cm on dm.dm_cm_id=cm.cm_id "+
-                    "where dm_status=0 "+
-                    "and LOWER(dm_design_no||''||dm_mft_date) LIKE LOWER($1);";
+                    "where LOWER(dm_design_no||''||dm_mft_date) LIKE LOWER($1);";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
@@ -319,8 +318,7 @@ router.post('/design/limit', oauth.authorise(), (req, res, next) => {
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
                     "FROM design_master dm "+
                     "left outer join customer_master cm on dm.dm_cm_id=cm.cm_id "+
-                    "where dm.dm_status = 0 "+
-                    "and LOWER(dm_design_no||''||dm_project_no||''||cm_name) LIKE LOWER($1) "+
+                    "where LOWER(dm_design_no||''||dm_project_no||''||cm_name) LIKE LOWER($1) "+
                     "order by dm.dm_id desc LIMIT $2 OFFSET $3";
 
     const query = client.query(strqry,[ str, req.body.number, req.body.begin]);
