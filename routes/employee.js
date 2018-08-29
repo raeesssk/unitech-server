@@ -78,11 +78,11 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
   var Storage = multer.diskStorage({
       destination: function (req, file, callback) {
           // callback(null, "./images");
-            callback(null, "../unitech/resources/img");
+            callback(null, "../nginx/html/images");
       },
       filename: function (req, file, callback) {
           var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
-          filenamestore = "../unitech/resources/img/"+fi;
+          filenamestore = "../images/"+fi;
           callback(null, fi);
       }
   });
@@ -117,11 +117,11 @@ router.post('/edit/:empId', oauth.authorise(), (req, res, next) => {
   var Storage = multer.diskStorage({
       destination: function (req, file, callback) {
           // callback(null, "./images");
-            callback(null, "../unitech/resources/img");
+            callback(null, "../nginx/html/images");
       },
       filename: function (req, file, callback) {
           var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
-          filenamestore = "../unitech/resources/img/"+fi;
+          filenamestore = "../images/"+fi;
           callback(null, fi);
       }
   });
@@ -163,7 +163,7 @@ router.post('/delete/:empId', oauth.authorise(), (req, res, next) => {
 
     client.query('BEGIN;');
 
-    var singleInsert = 'UPDATE employee_master SET emp_status=1 WHERE emp_id=($1) RETURNING *',
+    var singleInsert = 'UPDATE employee_master SET emp_status=1, emp_updated_at=now() WHERE emp_id=($1) RETURNING *',
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -294,27 +294,27 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
 });
 
 
-router.get('/view/:empId', oauth.authorise(), (req, res, next) => {
-  const results = [];
-  const id=req.params.empId;
-  pool.connect(function(err, client, done){
-    if(err) {
-      done();
-      // pg.end();
-      console.log("the error is"+err);
-      return res.status(500).json({success: false, data: err});
-    }
-    const query = client.query("SELECT * FROM user_master um left outer join employee_master em on um.um_emp_id=em.emp_id where um_id=$1",[id]);
-    query.on('row', (row) => {
-      results.push(row);
+// router.get('/view/:empId', oauth.authorise(), (req, res, next) => {
+//   const results = [];
+//   const id=req.params.empId;
+//   pool.connect(function(err, client, done){
+//     if(err) {
+//       done();
+//       // pg.end();
+//       console.log("the error is"+err);
+//       return res.status(500).json({success: false, data: err});
+//     }
+//     const query = client.query("SELECT * FROM user_master um left outer join employee_master em on um.um_emp_id=em.emp_id where um_id=$1",[id]);
+//     query.on('row', (row) => {
+//       results.push(row);
 
-    });
-    query.on('end', () => {
-      done();
-      // pg.end();
-      return res.json(results);
-    });
-  done(err);
-  });
-});
+//     });
+//     query.on('end', () => {
+//       done();
+//       // pg.end();
+//       return res.json(results);
+//     });
+//   done(err);
+//   });
+// });
 module.exports = router;

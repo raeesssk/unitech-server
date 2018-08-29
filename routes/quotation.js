@@ -360,30 +360,6 @@ router.get('/machine/:quotationId', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.get('/views/:designId', oauth.authorise(), (req, res, next) => {
-  const results = [];
-  const id=req.params.designId;
-  pool.connect(function(err, client, done){
-    if(err) {
-      done();
-      // pg.end();
-      console.log("the error is"+err);
-      return res.status(500).json({success: false, data: err});
-    }
-    const query = client.query("SELECT * FROM design_master dm LEFT OUTER JOIN customer_master cm on dm.dm_cm_id=cm.cm_id LEFT OUTER JOIN design_product_master dtm on dtm.dtm_dm_id=dm.dm_id  where dm_id=$1",[id]);
-    query.on('row', (row) => {
-      results.push(row);
-
-    });
-    query.on('end', () => {
-      done();
-      // pg.end();
-      return res.json(results);
-    });
-  done(err);
-  });
-});
-
 router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
   const results = [];
   pool.connect(function(err, client, done){

@@ -18,7 +18,7 @@ router.get('/:mmId', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
 
-    const strqry =  "SELECT mm_name||''||mm_price as mm_search, mm.mm_id, mm.mm_name, mm.mm_price "+
+    const strqry =  "SELECT mm_name||'-'||mm_price as mm_search, mm.mm_id, mm.mm_name, mm.mm_price "+
                     "FROM machine_master mm "+
                     "where mm.mm_status = 0 "+
                     "and mm.mm_id = $1";
@@ -127,7 +127,7 @@ router.post('/delete/:mmId', oauth.authorise(), (req, res, next) => {
 
     client.query('BEGIN;');
 
-    var singleInsert = 'UPDATE machine_master SET mm_status=1 WHERE mm_id=($1) RETURNING *',
+    var singleInsert = 'UPDATE machine_master SET mm_status=1, mm_updated_at=now() WHERE mm_id=($1) RETURNING *',
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -212,7 +212,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     const str = req.body.search+"%";
     // SQL Query > Select Data
 
-    const strqry =  "SELECT  mm_name||''||mm_price as mm_search,mm.mm_name, mm.mm_price, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
+    const strqry =  "SELECT  mm_name||'-'||mm_price as mm_search,mm.mm_name, mm.mm_price, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
                     "FROM machine_master mm "+
                     "where mm.mm_status = 0 "+
                     "and LOWER(mm_name||' '||mm_price ) LIKE LOWER($1) "+

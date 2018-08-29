@@ -132,7 +132,7 @@ router.post('/delete/:custId', oauth.authorise(), (req, res, next) => {
 
     client.query('BEGIN;');
 
-    var singleInsert = 'UPDATE customer_master SET cm_status=1 WHERE cm_id=($1) RETURNING *',
+    var singleInsert = 'UPDATE customer_master SET cm_status=1, cm_updated_at=now() WHERE cm_id=($1) RETURNING *',
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
