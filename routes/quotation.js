@@ -22,7 +22,7 @@ router.get('/:quotationId', oauth.authorise(), (req, res, next) => {
     const strqry =  "select qm.qm_id, qm.qm_quotation_no, qm.qm_date, qm.qm_total_cost, qm.qm_ref, qm.qm_comment, qm.qm_status, qm.qm_is_approve, qm.qm_created_at, qm.qm_updated_at, "+
                     "dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
-                    "FROM quatation_master qm "+
+                    "FROM quotation_master qm "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where qm.qm_id=$1";
@@ -56,7 +56,7 @@ router.get('/details/:quotationId', oauth.authorise(), (req, res, next) => {
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name, "+
                     "qpm.qpm_id, qpm.qpm_part_name, qpm.qpm_qty, qpm.qpm_part_no, qpm.qpm_total_cost "+
                     "FROM quotation_product_master qpm "+
-                    "inner join quatation_master qm on qpm.qpm_qm_id=qm.qm_id "+
+                    "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where qm.qm_id=$1";
@@ -94,7 +94,7 @@ router.get('/details/machine/:quotationId', oauth.authorise(), (req, res, next) 
                     "FROM quotation_product_machine_master qpmm "+
                     "inner join quotation_product_master qpm on qpmm.qpmm_qpm_id=qpm.qpm_id "+
                     "inner join machine_master mm on qpmm.qpmm_mm_id=mm.mm_id "+
-                    "inner join quatation_master qm on qpm.qpm_qm_id=qm.qm_id "+
+                    "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where qpm.qpm_id=$1";
@@ -127,7 +127,7 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
 
     client.query('BEGIN;');
 
-    var singleInsert = 'INSERT INTO quatation_master(qm_dm_id, qm_quotation_no, qm_date, qm_ref, qm_total_cost, qm_comment, qm_is_approve, qm_status) values($1,$2,$3,$4,$5,$6,0,0) RETURNING *',
+    var singleInsert = 'INSERT INTO quotation_master(qm_dm_id, qm_quotation_no, qm_date, qm_ref, qm_total_cost, qm_comment, qm_is_approve, qm_status) values($1,$2,$3,$4,$5,$6,0,0) RETURNING *',
         params = [quotation.qm_dm_id.dm_id,quotation.qm_quotation_no,quotation.qm_date,quotation.qm_ref,quotation.qm_total_cost, quotation.qm_comment];
     client.query(singleInsert, params, function (error, result) {
       
@@ -179,7 +179,7 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
     
-    var singleInsert = 'update quatation_master set  qm_ref_no=$1,qm_total_cost=$2, qm_updated_at=now() where qm_id=$3 RETURNING *',
+    var singleInsert = 'update quotation_master set  qm_ref_no=$1,qm_total_cost=$2, qm_updated_at=now() where qm_id=$3 RETURNING *',
         params = [quotation.qm_ref_no,quotation.qm_total_cost,id];
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -234,7 +234,7 @@ router.post('/delete/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
 
-    var singleInsert = "update quatation_master set qm_status=1, qm_is_approve=0, qm_updated_at=now() where qm_id=$1 RETURNING *",
+    var singleInsert = "update quotation_master set qm_status=1, qm_is_approve=0, qm_updated_at=now() where qm_id=$1 RETURNING *",
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -259,7 +259,7 @@ router.post('/isapprove/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
 
-    var singleInsert = "update quatation_master set qm_is_approve=1, qm_updated_at=now() where qm_id=$1 RETURNING *",
+    var singleInsert = "update quotation_master set qm_is_approve=1, qm_updated_at=now() where qm_id=$1 RETURNING *",
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -284,7 +284,7 @@ router.post('/isapprove/pending/:quotationId', oauth.authorise(), (req, res, nex
     }
     client.query('BEGIN;');
 
-    var singleInsert = "update quatation_master set qm_is_approve=0, qm_updated_at=now() where qm_id=$1 RETURNING *",
+    var singleInsert = "update quotation_master set qm_is_approve=0, qm_updated_at=now() where qm_id=$1 RETURNING *",
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -306,7 +306,7 @@ router.post('/serial/no', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const query = client.query("SELECT * from quatation_master order by qm_id desc limit 1");
+    const query = client.query("SELECT * from quotation_master order by qm_id desc limit 1");
     query.on('row', (row) => {
       results.push(row);
     });
@@ -332,7 +332,7 @@ router.post('/quotation/total', oauth.authorise(), (req, res, next) => {
 
     console.log(str);
     const strqry =  "SELECT count(qm_id) as total "+
-                    "from quatation_master qm "+
+                    "from quotation_master qm "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where LOWER(qm_quotation_no||''||dm_design_no||''||cm_name) LIKE LOWER($1);";
@@ -365,7 +365,7 @@ router.post('/quotation/limit', oauth.authorise(), (req, res, next) => {
     const strqry =  "select qm.qm_id, qm.qm_quotation_no, qm.qm_date, qm.qm_total_cost, qm.qm_ref, qm.qm_comment, qm.qm_status, qm.qm_is_approve, qm.qm_created_at, qm.qm_updated_at, "+
                     "dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
-                    "FROM quatation_master qm "+
+                    "FROM quotation_master qm "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where LOWER(qm_quotation_no||''||dm_design_no||''||cm_name) LIKE LOWER($1) "+
@@ -399,7 +399,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     const strqry =  "select qm.qm_id, qm.qm_quotation_no, qm.qm_date, qm.qm_total_cost, qm.qm_ref, qm.qm_comment, qm.qm_status, qm.qm_is_approve, qm.qm_created_at, qm.qm_updated_at, "+
                     "dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
-                    "FROM quatation_master qm "+
+                    "FROM quotation_master qm "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where qm.qm_status = 0 "+

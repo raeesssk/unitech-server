@@ -173,7 +173,7 @@ router.post('/bill/total', oauth.authorise(), (req, res, next) => {
     const strqry =  "SELECT count(bm_id) as total "+
                     "from bill_master bm "+
                     "left outer join customer_master cm on bm.bm_cm_id=cm.cm_id "+
-                    "left outer join quatation_master qm on bm.bm_qm_id=qm.qm_id "+
+                    "left outer join quotation_master qm on bm.bm_qm_id=qm.qm_id "+
                     "where bm_status=0 "+
                     "and LOWER(bm_invoice_no||''||qm_quotation_no||''||cm_name) LIKE LOWER($1);";
 
@@ -205,7 +205,7 @@ router.post('/bill/limit', oauth.authorise(), (req, res, next) => {
     const strqry =  "SELECT * "+
                     "FROM bill_master bm "+
                     "left outer join customer_master cm on bm.bm_cm_id=cm.cm_id "+
-                    "left outer join quatation_master qm on bm.bm_qm_id=qm.qm_id "+
+                    "left outer join quotation_master qm on bm.bm_qm_id=qm.qm_id "+
                     "where bm_status=0 "+
                     "and LOWER(bm_invoice_no||''||qm_quotation_no||''||cm_name) LIKE LOWER($1) "+
                     "order by bm.bm_id desc LIMIT $2 OFFSET $3";
