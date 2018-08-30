@@ -183,10 +183,10 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
             var maclist = product.newMachineDetails;
             var remmaclist = product.removeMachineDetails;
 
+            client.query("update quotation_product_master set qpm_total_cost=$1 where qpm_id = $2",[product.qpm_total_cost,product.qpm_id]);
 
             remmaclist.forEach(function(value,key){
-              client.query("delete from quotation_product_machine_master where qpmm_id = $1",
-                [value.qpmm_id]);
+              client.query("delete from quotation_product_machine_master where qpmm_id = $1",[value.qpmm_id]);
             });
 
             maclist.forEach(function(value,key){
