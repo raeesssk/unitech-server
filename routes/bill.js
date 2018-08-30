@@ -158,6 +158,28 @@ router.post('/delete/:billId', oauth.authorise(), (req, res, next) => {
   });
 });
 
+router.post('/serial/no', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const query = client.query("SELECT * from bill_master order by bm_id desc limit 1");
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
 router.post('/bill/total', oauth.authorise(), (req, res, next) => {
   const results = [];
   pool.connect(function(err, client, done){

@@ -242,14 +242,36 @@ router.post('/isapprove/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
 
-    var singleInsert = "update quotation_master set qm_is_approve=1, qm_updated_at=now() where qm_id=$1 RETURNING *",
+    const strqry =  "SELECT qm.qm_is_approve "+
+                    "from quotation_master qm "+
+                    "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
+                    "where qm.qm_is_approve=1";
+
+    const query = client.query(strqry);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+
+      if(results.length == 0){
+        var singleInsert = "update quotation_master set qm_is_approve=1, qm_updated_at=now() where qm_id=$1 RETURNING *",
         params = [id]
-    client.query(singleInsert, params, function (error, result) {
-        results.push(result.rows[0]); // Will contain your inserted rows
+        client.query(singleInsert, params, function (error, result) {
+            done();
+            client.query('COMMIT;');
+            return res.json(results);
+        });
+      }
+      else{
         done();
         client.query('COMMIT;');
         return res.json(results);
+      }
+      // pg.end();
+      
     });
+
+    
 
     done(err);
   });
@@ -386,8 +408,8 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where qm.qm_status = 0 "+
-                    "where  qm.qm_is_approve=1 "+
-                    "and LOWER(qm_quotation_no) LIKE LOWER($1) "+
+                    "and qm.qm_is_approve=1 "+
+                    "and LOWER(''||qm_quotation_no) LIKE LOWER($1) "+
                     "order by qm.qm_id desc LIMIT 10";
 
     const query = client.query(strqry,[str]);
