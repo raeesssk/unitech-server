@@ -147,7 +147,6 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
             });
 
           });
-
         
         });
 
@@ -165,11 +164,6 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
   const id = req.params.quotationId;
   const quotation=req.body.quotation;
   const personalDetails=req.body.personalDetails;
-  const machineDetails = req.body.machineDetails;
-  const oldProductDetails = req.body.oldProductDetails;
-  const removeProductDetails = req.body.removeProductDetails;
-  const oldMachineDetails = req.body.oldMachineDetails;
-  const removeMachineDetails = req.body.removeMachineDetails;
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -179,40 +173,29 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
     
-    var singleInsert = 'update quotation_master set  qm_ref_no=$1,qm_total_cost=$2, qm_updated_at=now() where qm_id=$3 RETURNING *',
-        params = [quotation.qm_ref_no,quotation.qm_total_cost,id];
+    var singleInsert = 'update quotation_master set  qm_ref=$1, qm_date=$2, qm_total_cost=$3, qm_comment=$4, qm_updated_at=now() where qm_id=$5 RETURNING *',
+        params = [quotation.qm_ref, quotation.qm_date, quotation.qm_total_cost, quotation.qm_comment, id];
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
-        removeProductDetails.forEach(function(product, index) {
-          client.query('delete from quotation_product_master where qpm_id=$1',[product.qpm_id]);
-        });
-
-        oldProductDetails.forEach(function(val, index) {
-          client.query('update quotation_product_master set qpm_part_np=$1, qpm_part_name=$2, qpm_qty=$3, qpm_qm_id=$4, qpm_updated_at=now() where qpm_id=$5',
-          	[val.qpm_part_np,val.qpm_part_name,val.qpm_qty,result.rows[0].qm_id,val.qpm_id]);
-        });
-
         personalDetails.forEach(function(product, index) {
-        client.query('INSERT INTO quotation_product_master(qpm_part_no, qpm_part_name, qpm_qty, qpm_qm_id, qpm_status)VALUES ($1, $2, $3, $4, 0)',
-          [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].qm_id]);
+
+            var maclist = product.newMachineDetails;
+            var remmaclist = product.removeMachineDetails;
+
+
+            remmaclist.forEach(function(value,key){
+              client.query("delete from quotation_product_machine_master where qpmm_id = $1",
+                [value.qpmm_id]);
+            });
+
+            maclist.forEach(function(value,key){
+              client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
+                [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
+            });
+        
         });
 
-        removeMachineDetails.forEach(function(product, index) {
-          client.query('delete from public.quotation_product_machine_master where qpmm_id=$1',[product.qpmm_id]);
-        });
-        
-        oldMachineDetails.forEach(function(product, index) {
-          client.query('update quotation_product_machine_master set qpmm_mm_id=$1, qpmm_mm_hr=$2, qpmm_qm_id=$3, qpmm_total_cost=$4, qpmm_updated_at=now() where qpmm_id=$5',
-            [product.qpmm_mm_id, product.qpmm_mm_hr, result.rows[0].qm_id, product.qpmm_total_cost, product.qpmm_id]);
-        });
-        
-        machineDetails.forEach(function(value, index) {
-        client.query('INSERT INTO quotation_product_machine_master(qpmm_mm_id, qpmm_qm_id, qpmm_mm_hr, qpmm_total_cost, qpmm_status)VALUES ($1, $2, $3, $4, 0)',
-          [value.qpmm_mm_id.mm_id, result.rows[0].qm_id, value.qpmm_mm_hr, value.qpmm_total_cost]);
-        });
-        
-        console.log(results);
         client.query('COMMIT;');
         done();
         return res.json(results);
