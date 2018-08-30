@@ -90,14 +90,14 @@ router.get('/details/machine/:quotationId', oauth.authorise(), (req, res, next) 
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name, "+
                     "mm_name||'-'||mm_price as mm_search, mm.mm_id, mm.mm_name, mm.mm_price, "+
                     "qpm.qpm_id, qpm.qpm_part_name, qpm.qpm_qty, qpm.qpm_part_no, qpm.qpm_total_cost, "+
-                    "qpm.qpmm_id, qpm.qpmm_total_cost, qpm.qpmm_mm_hr "+
+                    "qpmm.qpmm_id, qpmm.qpmm_total_cost, qpmm.qpmm_mm_hr "+
                     "FROM quotation_product_machine_master qpmm "+
                     "inner join quotation_product_master qpm on qpmm.qpmm_qpm_id=qpm.qpm_id "+
                     "inner join machine_master mm on qpmm.qpmm_mm_id=mm.mm_id "+
                     "inner join quatation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
-                    "where qm.qm_id=$1";
+                    "where qpm.qpm_id=$1";
 
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
