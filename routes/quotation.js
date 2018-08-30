@@ -163,7 +163,7 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
   const results = [];
   const id = req.params.quotationId;
   const quotation=req.body.quotation;
-  const personalDetails=req.body.personalDetails;
+  const purchaseMultipleData=req.body.purchaseMultipleData;
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -178,7 +178,7 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
-        personalDetails.forEach(function(product, index) {
+        purchaseMultipleData.forEach(function(product, index) {
 
             var maclist = product.newMachineDetails;
             var remmaclist = product.removeMachineDetails;
