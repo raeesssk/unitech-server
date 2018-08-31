@@ -120,10 +120,10 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
     client.query(designInsert, params, function (error, result) {
         results.push(result.rows[0]) // Will contain your inserted rows
 
-      purchaseMultipleData.forEach(function(product, index) {
-        client.query('INSERT INTO design_product_master(dtm_part_no, dtm_part_name, dtm_qty, dtm_dm_id)VALUES ($1, $2, $3, $4)',
-          [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
-      });
+      // purchaseMultipleData.forEach(function(product, index) {
+      //   client.query('INSERT INTO design_product_master(dtm_part_no, dtm_part_name, dtm_qty, dtm_dm_id)VALUES ($1, $2, $3, $4)',
+      //     [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
+      // });
 
       client.query('COMMIT;');
       done();
