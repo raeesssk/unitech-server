@@ -198,7 +198,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
         removeDetails.forEach(function(product, index) {
 
           const fin = product.dtm_image;
-          if(fin == null)
+          if(fin != null)
           {
             const finyr = fin.split('/');
             const finyr2 = finyr[2];
