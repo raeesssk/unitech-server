@@ -160,10 +160,7 @@ router.post('/image/add', oauth.authorise(), (req, res, next) => {
         console.log("the error is"+err);
         return res.status(500).json({success: false, data: err});
       }
-
-      client.query('INSERT INTO design_product_master(dtm_part_no, dtm_part_name, dtm_qty, dtm_dm_id)VALUES ($1, $2, $3, $4)',
-          [product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id]);
-
+      
       var singleInsert = 'INSERT INTO design_product_master(dtm_part_no, dtm_part_name, dtm_qty, dtm_dm_id, dtm_image)VALUES ($1, $2, $3, $4, $5) RETURNING *',
           params = [req.body.dtm_part_no,req.body.dtm_part_name,req.body.dtm_qty,req.body.dim_dm_id, filenamestore]
       // var singleInsert = 'INSERT INTO design_image_master(dim_dm_id,dim_image) values($1,$2) RETURNING *',
