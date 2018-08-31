@@ -196,10 +196,14 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
         results.push(result.rows[0]); // Will contain your inserted rows
         
         removeDetails.forEach(function(product, index) {
-          const fin = product.dtm_image;
-          const finyr = fin.split('/');
-          const finyr2 = finyr[2];
-          cmd.run('rm /usr/share/nginx/html/images/'+finyr2);
+          if(product.dtm_image == null)
+          {
+            const fin = product.dtm_image;
+            const finyr = fin.split('/');
+            const finyr2 = finyr[2];
+            cmd.run('rm /usr/share/nginx/html/images/'+finyr2);
+          }
+          
           client.query('delete from public.design_product_master where dtm_id=$1',[product.dtm_id]);
         });
 
