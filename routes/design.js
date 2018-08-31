@@ -55,7 +55,7 @@ router.get('/details/:designId', oauth.authorise(), (req, res, next) => {
     }
     // SQL Query > Select Data
     const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
-                    "dtm.dtm_id, dtm.dtm_part_no, dtm.dtm_part_name, dtm.dtm_qty "+
+                    "dtm.dtm_id, dtm.dtm_part_no, dtm.dtm_part_name, dtm.dtm_qty, dtm_image "+
                     "FROM design_product_master dtm "+
                     "inner join design_master dm on dtm.dtm_dm_id=dm.dm_id "+
                     "where dtm.dtm_dm_id=$1";
@@ -72,39 +72,39 @@ router.get('/details/:designId', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.get('/details/images/:designId', oauth.authorise(), (req, res, next) => {
-  const results = [];
-  const id = req.params.designId;
-  pool.connect(function(err, client, done){
-    if(err) {
-      done();
-      // pg.end();
-      console.log("the error is"+err);
-      return res.status(500).json({success: false, data: err});
-    }
-    // SQL Query > Select Data
-    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
-                    "dim.dim_id, dim.dim_image "+
-                    "FROM design_image_master dim "+
-                    "inner join design_master dm on dim.dim_dm_id=dm.dm_id "+
-                    "where dim.dim_dm_id=$1";
-    const query = client.query(strqry,[id]);
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    query.on('end', () => {
-      done();
-      // pg.end();
-      return res.json(results);
-    });
-  done(err);
-  });
-});
+// router.get('/details/images/:designId', oauth.authorise(), (req, res, next) => {
+//   const results = [];
+//   const id = req.params.designId;
+//   pool.connect(function(err, client, done){
+//     if(err) {
+//       done();
+//       // pg.end();
+//       console.log("the error is"+err);
+//       return res.status(500).json({success: false, data: err});
+//     }
+//     // SQL Query > Select Data
+//     const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
+//                     "dim.dim_id, dim.dim_image "+
+//                     "FROM design_image_master dim "+
+//                     "inner join design_master dm on dim.dim_dm_id=dm.dm_id "+
+//                     "where dim.dim_dm_id=$1";
+//     const query = client.query(strqry,[id]);
+//     query.on('row', (row) => {
+//       results.push(row);
+//     });
+//     query.on('end', () => {
+//       done();
+//       // pg.end();
+//       return res.json(results);
+//     });
+//   done(err);
+//   });
+// });
 
 router.post('/add', oauth.authorise(), (req, res, next) => {
   const results = [];
   const purchasedesignData = req.body.design;
-  const purchaseMultipleData=req.body.purchaseMultipleData;
+  // const purchaseMultipleData=req.body.purchaseMultipleData;
   pool.connect(function(err, client, done){
     if(err) {
       done();
