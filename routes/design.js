@@ -196,9 +196,10 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
         results.push(result.rows[0]); // Will contain your inserted rows
         
         removeDetails.forEach(function(product, index) {
-          if(product.dtm_image == null || product.dtm_image == undefined)
+
+          const fin = product.dtm_image;
+          if(fin == null)
           {
-            const fin = product.dtm_image;
             const finyr = fin.split('/');
             const finyr2 = finyr[2];
             cmd.run('rm /usr/share/nginx/html/images/'+finyr2);
