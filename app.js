@@ -13,10 +13,13 @@ var oauth = require('./oauth');
 var login = require('./routes/login');
 var customer = require('./routes/customer');
 var employee = require('./routes/employee');
+var machine = require('./routes/machine');
+var inventory = require('./routes/inventory');
+var design= require('./routes/design');
+var quotation= require('./routes/quotation');
 var userm = require('./routes/userm');
 var role = require('./routes/role');
 var permission = require('./routes/permission');
-var machine = require('./routes/machine');
 var product = require('./routes/product');
 var expense = require('./routes/expense');
 
@@ -27,8 +30,6 @@ var user = require('./routes/user');
 var sms = require('./routes/sms');
 var emailsent = require('./routes/emailsent');
 var backup = require('./routes/backup');
-var quotation= require('./routes/quotation');
-var design= require('./routes/design');
 var bill= require('./routes/bill');
 
 var pmx = require('pmx').init({
@@ -59,13 +60,16 @@ app.all('/oauth/token', app.oauth.grant());
 app.use(app.oauth.errorHandler());
 
 // Define Routes Here
-app.use('/login', login);
 app.use('/customer', customer);
 app.use('/employee', employee);
+app.use('/machine', machine);
+app.use('/inventory', inventory);
+app.use('/design', design);
+app.use('/quotation', quotation);
+app.use('/login', login);
 app.use('/userm', userm);
 app.use('/role', role);
 app.use('/permission', permission);
-app.use('/machine', machine);
 app.use('/product', product);
 app.use('/expense', expense);
 app.use('/invoice', invoice);
@@ -74,8 +78,6 @@ app.use('/sms', sms);
 app.use('/emailsent', emailsent);
 app.use('/backup', backup);
 app.use('/user', user);
-app.use('/quotation', quotation);
-app.use('/design', design);
 app.use('/bill', bill);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
