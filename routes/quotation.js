@@ -58,7 +58,7 @@ router.get('/details/:quotationId', oauth.authorise(), (req, res, next) => {
                     "qpm.qpm_id, qpm.qpm_qty, qpm.qpm_price, qpm.qpm_total_cost "+
                     "FROM quotation_product_master qpm "+
                     "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
-                    "inner join inventory_master qm on qpm.qpm_im_id=im.im_id "+
+                    "inner join inventory_master im on qpm.qpm_im_id=im.im_id "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where qm.qm_id=$1";
@@ -96,7 +96,7 @@ router.get('/details/machine/:quotationId', oauth.authorise(), (req, res, next) 
                     "qpmm.qpmm_id, qpmm.qpmm_total_cost, qpmm.qpmm_mm_hr "+
                     "FROM quotation_product_machine_master qpmm "+
                     "inner join quotation_product_master qpm on qpmm.qpmm_qpm_id=qpm.qpm_id "+
-                    "inner join inventory_master qm on qpm.qpm_im_id=im.im_id "+
+                    "inner join inventory_master im on qpm.qpm_im_id=im.im_id "+
                     "inner join machine_master mm on qpmm.qpmm_mm_id=mm.mm_id "+
                     "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
@@ -187,7 +187,7 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
             var maclist = product.newMachineDetails;
             var remmaclist = product.removeMachineDetails;
 
-            client.query("update quotation_product_master set qpm_price=$1, qpm_total_cost=$2 where qpm_id = $3",[product.qpm_price,product.qpm_total_cost,product.qpm_id]);
+            client.query("update quotation_product_master set qpm_total_cost=$1 where qpm_id = $2",[product.qpm_total_cost,product.qpm_id]);
 
             remmaclist.forEach(function(value,key){
               client.query("delete from quotation_product_machine_master where qpmm_id = $1",[value.qpmm_id]);
