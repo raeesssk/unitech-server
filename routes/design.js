@@ -55,7 +55,7 @@ router.get('/details/:designId', oauth.authorise(), (req, res, next) => {
     }
     // SQL Query > Select Data
     const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
-                    "SELECT im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at, "+
+                    "im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at, "+
                     "dtm.dtm_id, dtm.dtm_qty, dtm_image "+
                     "FROM design_product_master dtm "+
                     "inner join design_master dm on dtm.dtm_dm_id=dm.dm_id "+
