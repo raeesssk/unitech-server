@@ -216,7 +216,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     const str = req.body.search+"%";
     // SQL Query > Select Data
 
-    const strqry =  "SELECT im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at "+
+    const strqry =  "SELECT '('||im_part_no||') '||im_part_name as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at "+
                     "FROM inventory_master im "+
                     "where im.im_status = 0 "+
                     "and LOWER(im_part_no||' - '||im_part_name ) LIKE LOWER($1) "+
