@@ -55,9 +55,11 @@ router.get('/details/:designId', oauth.authorise(), (req, res, next) => {
     }
     // SQL Query > Select Data
     const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
-                    "dtm.dtm_id, dtm.dtm_part_no, dtm.dtm_part_name, dtm.dtm_qty, dtm_image "+
+                    "SELECT im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at, "+
+                    "dtm.dtm_id, dtm.dtm_qty, dtm_image "+
                     "FROM design_product_master dtm "+
                     "inner join design_master dm on dtm.dtm_dm_id=dm.dm_id "+
+                    "inner join inventory_master im on dtm.dtm_im_id=im.im_id "+
                     "where dtm.dtm_dm_id=$1";
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
@@ -161,8 +163,8 @@ router.post('/image/add', oauth.authorise(), (req, res, next) => {
         return res.status(500).json({success: false, data: err});
       }
 
-      var singleInsert = 'INSERT INTO design_product_master(dtm_part_no, dtm_part_name, dtm_qty, dtm_dm_id, dtm_image) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-          params = [req.body.dtm_part_no,req.body.dtm_part_name,req.body.dtm_qty,req.body.dim_dm_id, filenamestore]
+      var singleInsert = 'INSERT INTO design_product_master(dtm_im_id, dtm_qty, dtm_dm_id, dtm_image) VALUES ($1, $2, $3, $4) RETURNING *',
+          params = [req.body.im_id.im_id,req.body.dtm_qty,req.body.dim_dm_id, filenamestore]
       // var singleInsert = 'INSERT INTO design_image_master(dim_dm_id,dim_image) values($1,$2) RETURNING *',
       //     params = [req.body.dim_dm_id, filenamestore]
       client.query(singleInsert, params, function (error, result) {
@@ -209,7 +211,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
         });
 
         oldDetails.forEach(function(product, index) {
-          client.query('update design_product_master set dtm_part_no=$1, dtm_part_name=$2, dtm_qty=$3, dtm_dm_id=$4 where dtm_id=$5',[product.dtm_part_no,product.dtm_part_name,product.dtm_qty,result.rows[0].dm_id,product.dtm_id]);
+          client.query('update design_product_master set dtm_qty=$1, dtm_dm_id=$2 where dtm_id=$3',[product.dtm_qty,result.rows[0].dm_id,product.dtm_id]);
         });
 
         // removeImagesDetails.forEach(function(product, index) {
