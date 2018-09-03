@@ -102,9 +102,10 @@ router.post('/edit/:imId', oauth.authorise(), (req, res, next) => {
 
     client.query('BEGIN;');
 
+
     var cash = req.body.im_opening_quantity - req.body.old_im_opening_quantity;
 
-    var singleInsert = 'UPDATE inventory_master SET im_part_no=$1, im_part_name=$2, im_quantity=$3, im_opening_quantity=$4, im_price=$5, im_mrp=$6, im_updated_at=now() where im_id=$7 RETURNING *',
+    var singleInsert = 'UPDATE inventory_master SET im_part_no=$1, im_part_name=$2, im_quantity=im_quantity+$3, im_opening_quantity=$4, im_price=$5, im_mrp=$6, im_updated_at=now() where im_id=$7 RETURNING *',
         params = [req.body.im_part_no,req.body.im_part_name,cash,req.body.im_opening_quantity,req.body.im_price,req.body.im_mrp,id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
