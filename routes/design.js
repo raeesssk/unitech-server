@@ -164,7 +164,7 @@ router.post('/image/add', oauth.authorise(), (req, res, next) => {
       }
 
       var singleInsert = 'INSERT INTO design_product_master(dtm_im_id, dtm_qty, dtm_dm_id, dtm_image) VALUES ($1, $2, $3, $4) RETURNING *',
-          params = [req.body.im_id.im_id,req.body.dtm_qty,req.body.dim_dm_id, filenamestore]
+          params = [req.body.dtm_im_id,req.body.dtm_qty,req.body.dim_dm_id, filenamestore]
       // var singleInsert = 'INSERT INTO design_image_master(dim_dm_id,dim_image) values($1,$2) RETURNING *',
       //     params = [req.body.dim_dm_id, filenamestore]
       client.query(singleInsert, params, function (error, result) {
