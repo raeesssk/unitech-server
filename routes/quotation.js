@@ -55,10 +55,12 @@ router.get('/details/:quotationId', oauth.authorise(), (req, res, next) => {
                     "dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name, "+
                     "im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at, "+
-                    "qpm.qpm_id, qpm.qpm_qty, qpm.qpm_price, qpm.qpm_total_cost "+
+                    "qpm.qpm_id, qpm.qpm_qty, qpm.qpm_price, qpm.qpm_total_cost, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, "+
+                    "mtm_name||'-'||mtm_price as mtm_search, mtm.mtm_id, mtm.mtm_name, mtm.mtm_density, mtm.mtm_price, mtm.mtm_status, mtm.mtm_created_at, mtm.mtm_updated_at "+
                     "FROM quotation_product_master qpm "+
                     "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     "inner join inventory_master im on qpm.qpm_im_id=im.im_id "+
+                    "inner join material_master mtm on qpm.qpm_mtm_id=mtm.mtm_id "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where qm.qm_id=$1";
@@ -92,11 +94,13 @@ router.get('/details/machine/:quotationId', oauth.authorise(), (req, res, next) 
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name, "+
                     "mm_name||'-'||mm_price as mm_search, mm.mm_id, mm.mm_name, mm.mm_price, "+
                     "im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at, "+
-                    "qpm.qpm_id, qpm.qpm_qty, qpm.qpm_price, qpm.qpm_total_cost, "+
+                    "qpm.qpm_id, qpm.qpm_qty, qpm.qpm_price, qpm.qpm_total_cost, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, "+
+                    "mtm_name||'-'||mtm_price as mtm_search, mtm.mtm_id, mtm.mtm_name, mtm.mtm_density, mtm.mtm_price, mtm.mtm_status, mtm.mtm_created_at, mtm.mtm_updated_at, "+
                     "qpmm.qpmm_id, qpmm.qpmm_total_cost, qpmm.qpmm_mm_hr "+
                     "FROM quotation_product_machine_master qpmm "+
                     "inner join quotation_product_master qpm on qpmm.qpmm_qpm_id=qpm.qpm_id "+
                     "inner join inventory_master im on qpm.qpm_im_id=im.im_id "+
+                    "inner join material_master mtm on qpm.qpm_mtm_id=mtm.mtm_id "+
                     "inner join machine_master mm on qpmm.qpmm_mm_id=mm.mm_id "+
                     "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
@@ -139,8 +143,8 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
 
         purchaseMultipleData.forEach(function(product, index) {
 
-          var singleInsertPro = 'INSERT INTO quotation_product_master(qpm_qm_id, qpm_im_id, qpm_qty, qpm_price, qpm_total_cost)VALUES ($1, $2, $3, $4, $5) RETURNING *',
-          paramsPro = [result.rows[0].qm_id,product.im_id,product.dtm_qty,product.qpm_price,product.dtm_total_cost];
+          var singleInsertPro = 'INSERT INTO quotation_product_master(qpm_qm_id, qpm_im_id, qpm_qty, qpm_total_cost, qpm_mtm_id, qpm_length, qpm_width, qpm_thickness, qpm_raw_mat_wt, qpm_rm, qpm_material_cost)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+          paramsPro = [result.rows[0].qm_id,product.im_id,product.dtm_qty,product.dtm_total_cost, product.mtm_id, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_raw_mat_wt, product.dtm_rm, product.dtm_material_cost];
           
           client.query(singleInsertPro, paramsPro, function (errorPro, resultPro) {
 
