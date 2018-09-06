@@ -119,7 +119,7 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
 
     client.query('BEGIN;');
 
-    var designInsert = 'INSERT INTO public.design_master( dm_design_no, dm_cm_id, dm_mft_date, dm_dely_date, dm_project_no, dm_po_no, dm_po_date,  dm.dm_date, dm_status)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0) RETURNING *',
+    var designInsert = 'INSERT INTO public.design_master( dm_design_no, dm_cm_id, dm_mft_date, dm_dely_date, dm_project_no, dm_po_no, dm_po_date,  dm_date, dm_status)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0) RETURNING *',
         params = [purchasedesignData.dm_design_no,purchasedesignData.dm_cm_id.cm_id,purchasedesignData.dm_mft_date,purchasedesignData.dm_dely_date,purchasedesignData.dm_project_no,purchasedesignData.dm_po_no,purchasedesignData.dm_po_date,purchasedesignData.dm_date]
     client.query(designInsert, params, function (error, result) {
         results.push(result.rows[0]) // Will contain your inserted rows
