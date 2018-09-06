@@ -213,7 +213,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const str = req.body.search+"%";
+    const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
     const strqry =  "SELECT '('||im_part_no||') '||im_part_name as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at "+
