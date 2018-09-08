@@ -149,7 +149,7 @@ router.post('/machine/total', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const str = req.body.search+"%";
+    const str = "%"+req.body.search+"%";
 
     const strqry =  "SELECT count(mm.mm_id) as total "+
                     "from machine_master mm "+
@@ -178,7 +178,7 @@ router.post('/machine/limit', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const str = req.body.search+"%";
+    const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
     const strqry =  "SELECT mm.mm_id, mm.mm_name, mm.mm_price, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
@@ -209,7 +209,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const str = req.body.search+"%";
+    const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
     const strqry =  "SELECT  mm_name||'-'||mm_price as mm_search,mm.mm_name, mm.mm_price, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
