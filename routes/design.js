@@ -55,12 +55,10 @@ router.get('/details/:designId', oauth.authorise(), (req, res, next) => {
     }
     // SQL Query > Select Data
     const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
-                    "im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at, "+
                     "mtm_name||'-'||mtm_price as mtm_search, mtm.mtm_id, mtm.mtm_name, mtm.mtm_density, mtm.mtm_price, mtm.mtm_status, mtm.mtm_created_at, mtm.mtm_updated_at, "+
-                    "dtm.dtm_id, dtm.dtm_qty, dtm.dtm_image, dtm.dtm_material_cost, dtm.dtm_length, dtm.dtm_width, dtm.dtm_thickness, dtm.dtm_raw_mat_wt, dtm.dtm_rm "+
+                    "dtm.dtm_id, dtm.dtm_qty, dtm.dtm_image, dtm.dtm_material_cost, dtm.dtm_length, dtm.dtm_width, dtm.dtm_thickness, dtm.dtm_raw_mat_wt, dtm.dtm_rm, dtm.dtm_material_code, dtm.dtm_part_name, dtm.dtm_edge_length, dtm.dtm_diameter, dtm.dtm_grinding "+
                     "FROM design_product_master dtm "+
                     "inner join design_master dm on dtm.dtm_dm_id=dm.dm_id "+
-                    "inner join inventory_master im on dtm.dtm_im_id=im.im_id "+
                     "inner join material_master mtm on dtm.dtm_mtm_id=mtm.mtm_id "+
                     "where dtm.dtm_dm_id=$1";
     const query = client.query(strqry,[id]);
@@ -125,8 +123,8 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
         results.push(result.rows[0]) // Will contain your inserted rows
 
       purchaseMultipleData.forEach(function(product, index) {
-        client.query('INSERT INTO design_product_master(dtm_im_id, dtm_qty, dtm_dm_id, dtm_mtm_id, dtm_material_cost, dtm_length, dtm_width, dtm_thickness, dtm_raw_mat_wt, dtm_rm)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
-          [product.im_id.im_id,product.dtm_qty,result.rows[0].dm_id, product.mtm_id.mtm_id, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_raw_mat_wt, product.dtm_rm]);
+        client.query('INSERT INTO design_product_master(dtm_qty, dtm_dm_id, dtm_mtm_id, dtm_material_cost, dtm_length, dtm_width, dtm_thickness, dtm_raw_mat_wt, dtm_rm, dtm_material_code, dtm_part_name, dtm_edge_length, dtm_diameter, dtm_grinding)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
+          [product.dtm_qty,result.rows[0].dm_id, product.mtm_id.mtm_id, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_raw_mat_wt, product.dtm_rm, product.dtm_material_code, product.dtm_part_name, product.dtm_edge_length, product.dtm_diameter, product.dtm_grinding]);
       });
 
       client.query('COMMIT;');
