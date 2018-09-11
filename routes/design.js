@@ -25,7 +25,7 @@ router.get('/:designId', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
+    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
                     "FROM design_master dm "+
                     "inner join customer_master cm on dm.dm_cm_id=cm.cm_id "+
@@ -54,7 +54,7 @@ router.get('/details/:designId', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
+    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
                     "im_part_no||'-'||im_part_name ||' '||(im_quantity) as im_search, im.im_id, im.im_part_no, im.im_part_name, im.im_quantity, im.im_opening_quantity, im.im_price, im.im_mrp, im.im_status, im.im_created_at, im.im_updated_at, "+
                     "mtm_name||'-'||mtm_price as mtm_search, mtm.mtm_id, mtm.mtm_name, mtm.mtm_density, mtm.mtm_price, mtm.mtm_status, mtm.mtm_created_at, mtm.mtm_updated_at, "+
                     "dtm.dtm_id, dtm.dtm_qty, dtm.dtm_image, dtm.dtm_material_cost, dtm.dtm_length, dtm.dtm_width, dtm.dtm_thickness, dtm.dtm_raw_mat_wt, dtm.dtm_rm "+
@@ -87,7 +87,7 @@ router.get('/details/:designId', oauth.authorise(), (req, res, next) => {
 //       return res.status(500).json({success: false, data: err});
 //     }
 //     // SQL Query > Select Data
-//     const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
+//     const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, "+
 //                     "dim.dim_id, dim.dim_image "+
 //                     "FROM design_image_master dim "+
 //                     "inner join design_master dm on dim.dim_dm_id=dm.dm_id "+
@@ -119,8 +119,8 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
 
     client.query('BEGIN;');
 
-    var designInsert = 'INSERT INTO public.design_master( dm_design_no, dm_cm_id, dm_mft_date, dm_dely_date, dm_project_no, dm_po_no, dm_po_date,  dm_date, dm_status)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0) RETURNING *',
-        params = [purchasedesignData.dm_design_no,purchasedesignData.dm_cm_id.cm_id,purchasedesignData.dm_mft_date,purchasedesignData.dm_dely_date,purchasedesignData.dm_project_no,purchasedesignData.dm_po_no,purchasedesignData.dm_po_date,purchasedesignData.dm_date]
+    var designInsert = 'INSERT INTO public.design_master( dm_design_no, dm_cm_id, dm_project_no,  dm_date, dm_status)VALUES ($1, $2, $3, $4, 0) RETURNING *',
+        params = [purchasedesignData.dm_design_no,purchasedesignData.dm_cm_id.cm_id,purchasedesignData.dm_project_no,purchasedesignData.dm_date]
     client.query(designInsert, params, function (error, result) {
         results.push(result.rows[0]) // Will contain your inserted rows
 
@@ -194,8 +194,8 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
     
-    var designInsert = 'update public.design_master set  dm_cm_id=$1, dm_mft_date=$2, dm_dely_date=$3, dm_project_no=$4, dm_po_no=$5, dm_po_date=$6, dm_updated_at=now() where dm_id=$7 RETURNING *',
-        params = [design.dm_cm.cm_id,design.dm_mft_date,design.dm_dely_date,design.dm_project_no,design.dm_po_no,design.dm_po_date,id];
+    var designInsert = 'update public.design_master set  dm_cm_id=$1, dm_project_no=$2, dm_date=$3, dm_updated_at=now() where dm_id=$4 RETURNING *',
+        params = [design.dm_cm.cm_id,design.dm_project_no,design.dm_date,id];
     client.query(designInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
@@ -295,7 +295,7 @@ router.post('/design/total', oauth.authorise(), (req, res, next) => {
     const strqry =  "SELECT count(dm_id) as total "+
                     "from design_master dm "+
                     "left outer join customer_master cm on dm.dm_cm_id=cm.cm_id "+
-                    "where LOWER(dm_design_no||''||dm_mft_date) LIKE LOWER($1);";
+                    "where LOWER(dm_design_no||''||dm_project_no||''||cm_name) LIKE LOWER($1);";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
@@ -322,7 +322,7 @@ router.post('/design/limit', oauth.authorise(), (req, res, next) => {
     const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
-    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at,  dm.dm_date, "+
+    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at,  dm.dm_date, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
                     "FROM design_master dm "+
                     "left outer join customer_master cm on dm.dm_cm_id=cm.cm_id "+
@@ -354,7 +354,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
     const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
     
-    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_mft_date, dm.dm_dely_date, dm.dm_project_no, dm.dm_po_no, dm.dm_po_date, dm.dm_status, dm.dm_created_at, dm.dm_updated_at,  dm.dm_date, "+
+    const strqry =  "select dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at,  dm.dm_date, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
                     "FROM design_master dm "+
                     "join customer_master cm on dm.dm_cm_id=cm.cm_id "+

@@ -149,7 +149,7 @@ router.post('/material/total', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const str = req.body.search+"%";
+    const str = "%"+req.body.search+"%";
 
     const strqry =  "SELECT count(mtm.mtm_id) as total "+
                     "from material_master mtm "+
@@ -178,7 +178,7 @@ router.post('/material/limit', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const str = req.body.search+"%";
+    const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
     const strqry =  "SELECT mtm_name||'-'||mtm_price as mtm_search, mtm.mtm_id, mtm.mtm_name, mtm.mtm_density, mtm.mtm_price, mtm.mtm_status, mtm.mtm_created_at, mtm.mtm_updated_at "+
@@ -209,7 +209,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
       console.log("the error is"+err);
       return res.status(500).json({success: false, data: err});
     }
-    const str = req.body.search+"%";
+    const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
     const strqry =  "SELECT mtm_name||'-'||mtm_price as mtm_search, mtm.mtm_id, mtm.mtm_name, mtm.mtm_density, mtm.mtm_price, mtm.mtm_status, mtm.mtm_created_at, mtm.mtm_updated_at "+
