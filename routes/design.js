@@ -183,6 +183,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
   const design=req.body.design;
   const oldDetails=req.body.oldDetails;
   const removeDetails=req.body.removeDetails;
+  const purchaseMultipleData=req.body.purchaseMultipleData;
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -211,16 +212,14 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
         });
 
         oldDetails.forEach(function(product, index) {
-          client.query('update design_product_master set dtm_qty=$1, dtm_dm_id=$2 where dtm_id=$3',[product.dtm_qty,result.rows[0].dm_id,product.dtm_id]);
+          client.query('update design_product_master set dtm_qty=$1, dtm_material_cost=$2, dtm_length=$3, dtm_width=$4, dtm_thickness=$5, dtm_diameter=$6, dtm_edge_length=$7, dtm_raw_mat_wt=$8, dtm_rm=$9 where dtm_id=$10',
+            [product.dtm_qty, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_diameter, product.dtm_edge_length, product.dtm_raw_mat_wt, product.dtm_rm, ,product.dtm_id]);
         });
 
-        // removeImagesDetails.forEach(function(product, index) {
-        //   const fin = product.dim_image;
-        //   const finyr = fin.split('/');
-        //   const finyr2 = finyr[2];
-        //   cmd.run('rm /usr/share/nginx/html/images/'+finyr2);
-        //   client.query('delete from public.design_image_master where dim_id=$1',[product.dim_id]);
-        // });
+        purchaseMultipleData.forEach(function(product, index) {
+        client.query('INSERT INTO design_product_master(dtm_qty, dtm_dm_id, dtm_mtm_id, dtm_material_cost, dtm_length, dtm_width, dtm_thickness, dtm_raw_mat_wt, dtm_rm, dtm_material_code, dtm_part_name, dtm_edge_length, dtm_diameter, dtm_shape)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
+          [product.dtm_qty,result.rows[0].dm_id, product.mtm_id.mtm_id, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_raw_mat_wt, product.dtm_rm, product.dtm_material_code, product.dtm_part_name, product.dtm_edge_length, product.dtm_diameter, product.dtm_shape]);
+        });
       
         client.query('COMMIT;');
         done();
@@ -357,7 +356,7 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
                     "FROM design_master dm "+
                     "join customer_master cm on dm.dm_cm_id=cm.cm_id "+
                     "where dm.dm_status = 0 "+
-                    "and LOWER(''||dm_design_no) LIKE LOWER($1) "+
+                    "and LOWER(dm_project_no) LIKE LOWER($1) "+
                     "order by dm.dm_id desc LIMIT 10";
 
     const query = client.query(strqry,[str]);
