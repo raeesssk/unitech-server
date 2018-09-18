@@ -213,7 +213,7 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
 
         oldDetails.forEach(function(product, index) {
           client.query('update design_product_master set dtm_qty=$1, dtm_material_cost=$2, dtm_length=$3, dtm_width=$4, dtm_thickness=$5, dtm_diameter=$6, dtm_edge_length=$7, dtm_raw_mat_wt=$8, dtm_rm=$9 where dtm_id=$10',
-            [product.dtm_qty, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_diameter, product.dtm_edge_length, product.dtm_raw_mat_wt, product.dtm_rm, ,product.dtm_id]);
+            [product.dtm_qty, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_diameter, product.dtm_edge_length, product.dtm_raw_mat_wt, product.dtm_rm,product.dtm_id]);
         });
 
         purchaseMultipleData.forEach(function(product, index) {
