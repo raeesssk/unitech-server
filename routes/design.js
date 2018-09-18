@@ -181,9 +181,9 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
   const results = [];
   const id = req.params.designId;
   const design=req.body.design;
-  const oldDetails=req.body.oldDetails;
-  const removeDetails=req.body.removeDetails;
-  const purchaseMultipleData=req.body.purchaseMultipleData;
+  const oldDetails=req.body.materialDetails;
+  const removeDetails=req.body.materialRemoveDetails;
+  const purchaseMultipleData=req.body.materialNewDetails;
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -218,8 +218,8 @@ router.post('/edit/:designId', oauth.authorise(), (req, res, next) => {
 
         purchaseMultipleData.forEach(function(product, index) {
         client.query('INSERT INTO design_product_master(dtm_qty, dtm_dm_id, dtm_mtm_id, dtm_material_cost, dtm_length, dtm_width, dtm_thickness, dtm_raw_mat_wt, dtm_rm, dtm_material_code, dtm_part_name, dtm_edge_length, dtm_diameter, dtm_shape)VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
-          [product.dtm_qty,result.rows[0].dm_id, product.mtm_id.mtm_id, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_raw_mat_wt, product.dtm_rm, product.dtm_material_code, product.dtm_part_name, product.dtm_edge_length, product.dtm_diameter, product.dtm_shape]);
-        });
+          [product.dtm_qty,id, product.mtm_id.mtm_id, product.dtm_material_cost, product.dtm_length, product.dtm_width, product.dtm_thickness, product.dtm_raw_mat_wt, product.dtm_rm, product.dtm_material_code, product.dtm_part_name, product.dtm_edge_length, product.dtm_diameter, product.dtm_shape]);
+      });
       
         client.query('COMMIT;');
         done();
