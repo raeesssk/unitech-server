@@ -231,5 +231,98 @@ router.post('/typeahead/search', oauth.authorise(), (req, res, next) => {
   });
 });
 
+router.post('/typeahead/boring/search', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const str = "HOLE SIZE "+req.body.search+"%";
+    // SQL Query > Select Data
+
+    const strqry =  "SELECT  mm_name||'-'||mm_price as mm_search,mm.mm_name, mm.mm_price, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
+                    "FROM machine_master mm "+
+                    "where mm.mm_status = 0 "+
+                    "and LOWER(mm_name) LIKE LOWER($1) "+
+                    "order by mm.mm_id desc LIMIT 16";
+
+    const query = client.query(strqry,[str]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
+router.post('/typeahead/drilling/search', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const str = "DRILLING "+req.body.search+"%";
+    // SQL Query > Select Data
+
+    const strqry =  "SELECT  mm_name||'-'||mm_price as mm_search,mm.mm_name, mm.mm_price, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
+                    "FROM machine_master mm "+
+                    "where mm.mm_status = 0 "+
+                    "and LOWER(mm_name) LIKE LOWER($1) "+
+                    "order by mm.mm_id desc LIMIT 16";
+
+    const query = client.query(strqry,[str]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
+router.post('/typeahead/taping/search', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const str = "TAPS "+req.body.search+"%";
+    // SQL Query > Select Data
+
+    const strqry =  "SELECT  mm_name||'-'||mm_price as mm_search,mm.mm_name, mm.mm_price, mm.mm_id, mm.mm_status, mm.mm_created_at, mm.mm_updated_at "+
+                    "FROM machine_master mm "+
+                    "where mm.mm_status = 0 "+
+                    "and LOWER(mm_name) LIKE LOWER($1) "+
+                    "order by mm.mm_id desc LIMIT 16";
+
+    const query = client.query(strqry,[str]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
 
 module.exports = router;
