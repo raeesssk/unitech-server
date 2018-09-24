@@ -432,7 +432,7 @@ router.post('/quotation/total', oauth.authorise(), (req, res, next) => {
                     "from quotation_master qm "+
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
-                    "where LOWER(qm_quotation_no||''||dm_design_no||''||cm_name) LIKE LOWER($1);";
+                    "where LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1);";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
@@ -465,7 +465,7 @@ router.post('/quotation/limit', oauth.authorise(), (req, res, next) => {
                     "FROM quotation_master qm "+
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
-                    "where LOWER(qm_quotation_no||''||dm_design_no||''||cm_name) LIKE LOWER($1) "+
+                    "where LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1) "+
                     "order by qm.qm_id desc LIMIT $2 OFFSET $3";
 
     const query = client.query(strqry,[ str, req.body.number, req.body.begin]);
