@@ -76,7 +76,7 @@ router.get('/details/:quotationId', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.get('/details/machine/:quotationId', oauth.authorise(), (req, res, next) => {
+router.get('/details/machine/boring/:quotationId', oauth.authorise(), (req, res, next) => {
   const results = [];
   const id = req.params.quotationId;
   pool.connect(function(err, client, done){
@@ -101,7 +101,8 @@ router.get('/details/machine/:quotationId', oauth.authorise(), (req, res, next) 
                     "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
-                    "where qpm.qpm_id=$1";
+                    "where qpm.qpm_id=$1"+
+                    "and mtm_name like 'HOLE SIZE %'";
 
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
