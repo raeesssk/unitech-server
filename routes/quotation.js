@@ -144,7 +144,7 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
           
 
           var singleInsertPro = 'INSERT INTO quotation_product_master(qpm_qm_id, qpm_qty, qpm_pr_no, qpm_item, qpm_material_code, qpm_part) values($1,$2,$3,$4,$5,$6 ) RETURNING *',
-          paramsPro = [result.rows[0].qm_id,product.dtm_qty,product.qpm_pr_no,product.qpm_item,product.qpm_material_code,product.qpm_part];
+          paramsPro = [result.rows[0].qm_id,product.qpm_qty,product.qpm_pr_no,product.qpm_item,product.qpm_material_code,product.qpm_part];
 
           client.query(singleInsertPro, paramsPro, function (errorPro, resultPro) {
 
