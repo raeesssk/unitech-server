@@ -266,8 +266,8 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
     client.query('BEGIN;');
     
     
-    var singleInsert = 'update quotation_master set  qm_ref=$1, qm_date=$2, qm_total_cost=$3, qm_comment=$4, qm_net_cost=$5, qm_cgst_per=$6, qm_cgst_amount=$7, qm_sgst_per=$8, qm_sgst_amount=$9, qm_igst_per=$10, qm_igst_amount=$11, qm_transport=$12, qm_other_charges=$13,  qm_discount=$14, qm_attend_by=$15, qm_date_of_email=$16 qm_updated_at=now() where qm_id=$17 RETURNING *',
-        params = [quotation.qm_ref, quotation.qm_date, quotation.qm_total_cost, quotation.qm_comment, quotation.qm_net_cost,quotation.qm_cgst_per,quotation.qm_cgst_amount,quotation.qm_sgst_per,quotation.qm_sgst_amount,quotation.qm_igst_per,quotation.qm_igst_amount,quotation.qm_transport,quotation.qm_other_charges,quotation.qm_discount,quotation.qm_attend_by,quotation.qm_date_of_email, id];
+    var singleInsert = 'update quotation_master set  qm_ref=$1, qm_date=$2, qm_total_cost=$3, qm_net_cost=$4, qm_cgst_per=$5, qm_cgst_amount=$6, qm_sgst_per=$7, qm_sgst_amount=$8, qm_igst_per=$9, qm_igst_amount=$10, qm_transport=$11, qm_other_charges=$12,  qm_discount=$13, qm_attend_by=$14, qm_date_of_email=$15, qm_updated_at=now() where qm_id=$16 RETURNING *',
+        params = [quotation.qm_ref, quotation.qm_date, quotation.qm_total_cost, quotation.qm_net_cost,quotation.qm_cgst_per,quotation.qm_cgst_amount,quotation.qm_sgst_per,quotation.qm_sgst_amount,quotation.qm_igst_per,quotation.qm_igst_amount,quotation.qm_transport,quotation.qm_other_charges,quotation.qm_discount,quotation.qm_attend_by,quotation.qm_date_of_email, id];
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
