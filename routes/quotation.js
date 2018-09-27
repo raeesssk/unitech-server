@@ -367,16 +367,34 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
                   [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
               });
 
+              var removeBorings = product.removeBorings;
+              removeBorings.forEach(function(value,key){
+                client.query("delete from quotation_product_machine_master where qpmm_id = $1",
+                  [value.qpmm_id]);
+              });
+
               var drillings = product.drillings;
               drillings.forEach(function(value,key){
                 client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
                   [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
               });
 
+              var removeDrillings = product.removeDrillings;
+              removeDrillings.forEach(function(value,key){
+                client.query("delete from quotation_product_machine_master where qpmm_id = $1",
+                  [value.qpmm_id]);
+              });
+
               var tapings = product.tapings;
               tapings.forEach(function(value,key){
                 client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
                   [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
+              });
+
+              var removeTapings = product.removeTapings;
+              removeTapings.forEach(function(value,key){
+                client.query("delete from quotation_product_machine_master where qpmm_id = $1",
+                  [value.qpmm_id]);
               });
         
           });
