@@ -102,7 +102,7 @@ router.get('/details/machine/boring/:quotationId', oauth.authorise(), (req, res,
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
                     "where qpm.qpm_id=$1 "+
-                    "and mtm_name like 'HOLE SIZE %'";
+                    "and mm_name like 'HOLE SIZE %'";
 
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
@@ -143,7 +143,7 @@ router.get('/details/machine/drilling/:quotationId', oauth.authorise(), (req, re
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
                     "where qpm.qpm_id=$1 "+
-                    "and mtm_name like 'DRILLING %'";
+                    "and mm_name like 'DRILLING %'";
 
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
@@ -184,7 +184,7 @@ router.get('/details/machine/taping/:quotationId', oauth.authorise(), (req, res,
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
                     "where qpm.qpm_id=$1 "+
-                    "and mtm_name like 'TAPS %'";
+                    "and mm_name like 'TAPS %'";
 
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
