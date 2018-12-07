@@ -35,7 +35,7 @@ router.post('/', function(req, res, next) {
       let mailOptions = {
         to: req.body.username,
         from: '3commastech@gmail.com',
-        subject: 'Restromaticz User Password Reset',
+        subject: 'Unitech Engineering Works User Password Reset',
         text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
           'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
           'http://' + 'unitech.3commastechnologies.com' + '/reset.html?token=' + token + '\n\n' +
