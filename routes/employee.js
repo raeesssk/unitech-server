@@ -78,11 +78,11 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
   var Storage = multer.diskStorage({
       destination: function (req, file, callback) {
           // callback(null, "./images");
-            callback(null, "../nginx/html/images");
+            callback(null, "../nginx/html/unitech/images");
       },
       filename: function (req, file, callback) {
           var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
-          filenamestore = "./images/"+fi;
+          filenamestore = "../images/"+fi;
           callback(null, fi);
       }
   });
@@ -117,11 +117,11 @@ router.post('/edit/:empId', oauth.authorise(), (req, res, next) => {
   var Storage = multer.diskStorage({
       destination: function (req, file, callback) {
           // callback(null, "./images");
-            callback(null, "../nginx/html/images");
+            callback(null, "../nginx/html/unitech/images");
       },
       filename: function (req, file, callback) {
           var fi = file.fieldname + "_" + Date.now() + "_" + file.originalname;
-          filenamestore = "./images/"+fi;
+          filenamestore = "../images/"+fi;
           callback(null, fi);
       }
   });
