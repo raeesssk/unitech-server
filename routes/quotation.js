@@ -62,7 +62,7 @@ router.get('/details/:quotationId', oauth.authorise(), (req, res, next) => {
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
                     "where qm.qm_id=$1 "+
-                    "order by qm_id asc";
+                    "order by qpm_id asc";
 
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
