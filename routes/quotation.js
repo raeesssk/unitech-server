@@ -621,6 +621,52 @@ router.post('/delete/:quotationId', oauth.authorise(), (req, res, next) => {
   });
 });
 
+// router.post('/isapprove/:quotationId', oauth.authorise(), (req, res, next) => {
+//   const results = [];
+//   const id = req.params.quotationId;
+//   pool.connect(function(err, client, done){
+//     if(err) {
+//       done();
+//       // pg.end();
+//       console.log("the error is"+err);
+//       return res.status(500).json({success: false, data: err});
+//     }
+//     client.query('BEGIN;');
+
+//     const strqry =  "SELECT qm.qm_is_approve "+
+//                     "from quotation_master qm "+
+//                     "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
+//                     "where qm.qm_is_approve=1";
+
+//     const query = client.query(strqry);
+//     query.on('row', (row) => {
+//       results.push(row);
+//     });
+//     query.on('end', () => {
+
+//       if(results.length == 0){
+//         var singleInsert = "update quotation_master set qm_is_approve=1, qm_updated_at=now() where qm_id=$1 RETURNING *",
+//         params = [id]
+//         client.query(singleInsert, params, function (error, result) {
+//             done();
+//             client.query('COMMIT;');
+//             return res.json(results);
+//         });
+//       }
+//       else{
+//         done();
+//         client.query('COMMIT;');
+//         return res.json(results);
+//       }
+//       // pg.end();
+      
+//     });
+
+    
+
+//     done(err);
+//   });
+// });
 router.post('/isapprove/:quotationId', oauth.authorise(), (req, res, next) => {
   const results = [];
   const id = req.params.quotationId;
@@ -633,42 +679,20 @@ router.post('/isapprove/:quotationId', oauth.authorise(), (req, res, next) => {
     }
     client.query('BEGIN;');
 
-    const strqry =  "SELECT qm.qm_is_approve "+
-                    "from quotation_master qm "+
-                    "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
-                    "where qm.qm_is_approve=1";
-
-    const query = client.query(strqry);
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    query.on('end', () => {
-
-      if(results.length == 0){
-        var singleInsert = "update quotation_master set qm_is_approve=1, qm_updated_at=now() where qm_id=$1 RETURNING *",
+    var singleInsert = "update quotation_master set qm_approve='approve', qm_updated_at=now() where qm_id=$1 RETURNING *",
         params = [id]
-        client.query(singleInsert, params, function (error, result) {
-            done();
-            client.query('COMMIT;');
-            return res.json(results);
-        });
-      }
-      else{
+    client.query(singleInsert, params, function (error, result) {
+        results.push(result.rows[0]); // Will contain your inserted rows
         done();
         client.query('COMMIT;');
         return res.json(results);
-      }
-      // pg.end();
-      
     });
-
-    
 
     done(err);
   });
 });
 
-router.post('/isapprove/pending/:quotationId', oauth.authorise(), (req, res, next) => {
+router.post('/disapprove/:quotationId', oauth.authorise(), (req, res, next) => {
   const results = [];
   const id = req.params.quotationId;
   pool.connect(function(err, client, done){
@@ -680,7 +704,7 @@ router.post('/isapprove/pending/:quotationId', oauth.authorise(), (req, res, nex
     }
     client.query('BEGIN;');
 
-    var singleInsert = "update quotation_master set qm_is_approve=0, qm_updated_at=now() where qm_id=$1 RETURNING *",
+    var singleInsert = "update quotation_master set qm_approve = 'disapprove', qm_updated_at=now() where qm_id=$1 RETURNING *",
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
@@ -731,7 +755,8 @@ router.post('/quotation/total', oauth.authorise(), (req, res, next) => {
                     "from quotation_master qm "+
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
-                    "where LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1);";
+                    "where qm.qm_approve = 'pending' "+
+                    "and LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1);";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
@@ -758,13 +783,148 @@ router.post('/quotation/limit', oauth.authorise(), (req, res, next) => {
     const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
-    const strqry =  "select qm.qm_id, qm.qm_quotation_no, qm.qm_date, qm.qm_total_cost, qm.qm_net_cost, qm.qm_cgst_per, qm.qm_cgst_amount, qm.qm_sgst_per, qm.qm_sgst_amount, qm.qm_igst_per, qm.qm_igst_amount, qm.qm_transport, qm.qm_other_charges, qm.qm_discount, qm.qm_ref, qm.qm_comment, qm.qm_status, qm.qm_is_approve, qm.qm_created_at, qm.qm_updated_at, qm.qm_attend_by, qm.qm_date_of_email, "+
+    const strqry =  "select qm.qm_id, qm.qm_quotation_no, qm.qm_date, qm.qm_total_cost, qm.qm_net_cost, qm.qm_cgst_per, qm.qm_cgst_amount, qm.qm_sgst_per, qm.qm_sgst_amount, qm.qm_igst_per, qm.qm_igst_amount, qm.qm_transport, qm.qm_other_charges, qm.qm_discount, qm.qm_ref, qm.qm_comment, qm.qm_status, qm.qm_approve, qm.qm_created_at, qm.qm_updated_at, qm.qm_attend_by, qm.qm_date_of_email, "+
                     // "dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
                     "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
                     "FROM quotation_master qm "+
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
                     "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
-                    "where LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1) "+
+                    "where qm.qm_approve = 'pending' "+
+                    "and LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1) "+
+                    "order by qm.qm_id desc LIMIT $2 OFFSET $3";
+
+    const query = client.query(strqry,[ str, req.body.number, req.body.begin]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
+router.post('/approve/total', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const str = "%"+req.body.search+"%";
+
+    console.log(str);
+    const strqry =  "SELECT count(qm_id) as total "+
+                    "from quotation_master qm "+
+                    // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
+                    "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
+                    "where qm.qm_approve = 'approve' "+
+                    "and LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1);";
+
+    const query = client.query(strqry,[str]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
+router.post('/approve/limit', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const str = "%"+req.body.search+"%";
+    // SQL Query > Select Data
+
+    const strqry =  "select qm.qm_id, qm.qm_quotation_no, qm.qm_date, qm.qm_total_cost, qm.qm_net_cost, qm.qm_cgst_per, qm.qm_cgst_amount, qm.qm_sgst_per, qm.qm_sgst_amount, qm.qm_igst_per, qm.qm_igst_amount, qm.qm_transport, qm.qm_other_charges, qm.qm_discount, qm.qm_ref, qm.qm_comment, qm.qm_status, qm.qm_approve, qm.qm_created_at, qm.qm_updated_at, qm.qm_attend_by, qm.qm_date_of_email, "+
+                    // "dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
+                    "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
+                    "FROM quotation_master qm "+
+                    // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
+                    "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
+                    "where qm.qm_approve = 'approve' "+
+                    "and LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1) "+
+                    "order by qm.qm_id desc LIMIT $2 OFFSET $3";
+
+    const query = client.query(strqry,[ str, req.body.number, req.body.begin]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
+router.post('/disapprove/total', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const str = "%"+req.body.search+"%";
+
+    console.log(str);
+    const strqry =  "SELECT count(qm_id) as total "+
+                    "from quotation_master qm "+
+                    // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
+                    "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
+                    "where qm.qm_approve = 'disapprove' "+
+                    "and LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1);";
+
+    const query = client.query(strqry,[str]);
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    query.on('end', () => {
+      done();
+      // pg.end();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
+router.post('/disapprove/limit', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    const str = "%"+req.body.search+"%";
+    // SQL Query > Select Data
+
+    const strqry =  "select qm.qm_id, qm.qm_quotation_no, qm.qm_date, qm.qm_total_cost, qm.qm_net_cost, qm.qm_cgst_per, qm.qm_cgst_amount, qm.qm_sgst_per, qm.qm_sgst_amount, qm.qm_igst_per, qm.qm_igst_amount, qm.qm_transport, qm.qm_other_charges, qm.qm_discount, qm.qm_ref, qm.qm_comment, qm.qm_status, qm.qm_approve, qm.qm_created_at, qm.qm_updated_at, qm.qm_attend_by, qm.qm_date_of_email, "+
+                    // "dm.dm_id, dm.dm_design_no, dm.dm_project_no, dm.dm_status, dm.dm_created_at, dm.dm_updated_at, dm.dm_date, "+
+                    "cm_name||'-'||cm_address||'-'||cm_mobile as cm_search, cm.cm_id, cm.cm_name, cm.cm_mobile, cm.cm_address, cm.cm_state, cm.cm_city, cm.cm_pin_code, cm.cm_credit, cm.cm_debit, cm.cm_email, cm.cm_gst, cm.cm_opening_credit, cm.cm_opening_debit, cm.cm_status, cm.cm_created_at, cm.cm_updated_at, cm.cm_contact_person_name, cm.cm_contact_person_number, cm.cm_dept_name "+
+                    "FROM quotation_master qm "+
+                    // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
+                    "inner join customer_master cm on qm.qm_cm_id=cm.cm_id "+
+                    "where qm.qm_approve = 'disapprove' "+
+                    "and LOWER(qm_quotation_no||''||cm_name) LIKE LOWER($1) "+
                     "order by qm.qm_id desc LIMIT $2 OFFSET $3";
 
     const query = client.query(strqry,[ str, req.body.number, req.body.begin]);
