@@ -397,104 +397,57 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
         
-        removeMaterial.forEach(function(product, index) {
-            client.query("delete from quotation_product_master where qpm_id = $1",
-                  [product.qpm_id]);
-        });
+        // removeMaterial.forEach(function(product, index) {
+        //     client.query("delete from quotation_product_master where qpm_id = $1",
+        //           [product.qpm_id]);
+        // });
 
-        purchaseMultipleData.forEach(function(product, index) {
+        // purchaseMultipleData.forEach(function(product, index) {
 
 
-            var singleInsertPro = 'update quotation_product_master set qpm_qty=$1, qpm_pr_no=$2, qpm_item=$3, qpm_material_code=$4, qpm_part=$5, qpm_total_cost=$6, qpm_mtm_id=$7, qpm_length=$8, qpm_width=$9, qpm_thickness=$10, qpm_raw_mat_wt=$11, qpm_rm=$12, qpm_material_cost=$13, qpm_sub_total=$14, qpm_profit=$15, qpm_cost_pc=$16, qpm_edge_length=$17, qpm_diameter=$18, qpm_grinding=$19, qpm_shape=$20, qpm_fl_cut=$21, qpm_turning=$22, qpm_milling=$23, qpm_boring=$24, qpm_drilling=$25, qpm_taping=$26, qpm_cnc_mc=$27, qpm_fabrication=$28, qpm_hard=$29, qpm_blacodising=$30, qpm_punching=$31, qpm_surf_treat=$32, qpm_wire_cut=$33, qpm_fl_price=$34, qpm_fl_qty=$35, qpm_tn_price=$36, qpm_tn_qty=$37, qpm_ml_price=$38, qpm_ml_qty=$39, qpm_gd_price=$40, qpm_gd_qty=$41, qpm_cnc_price=$42, qpm_cnc_qty=$43, qpm_wire_price=$44, qpm_wire_qty=$45, qpm_fab_price=$46, qpm_fab_qty=$47, qpm_hard_price=$48, qpm_hard_qty=$49, qpm_bc_price=$50, qpm_bc_qty=$51, qpm_pc_price=$52, qpm_pc_qty=$53, qpm_surf_price=$54, qpm_surf_qty=$55, qpm_profit_per=$56 where qpm_id = $57 RETURNING *',
-            paramsPro = [product.qpm_qty,product.qpm_pr_no,product.qpm_item,product.qpm_material_code,product.qpm_part,product.dtm_total_cost, product.mtm_id.mtm_id, product.qpm_length, product.qpm_width, product.qpm_thickness, product.qpm_raw_mat_wt, product.qpm_rm, product.qpm_material_cost, product.dtm_sub_total, product.dtm_profit, product.dtm_cost_pc, product.qpm_edge_length, product.qpm_diameter, product.qpm_grinding, product.qpm_shape, product.qpm_fl_cut, product.qpm_turning, product.qpm_milling, product.qpm_boring, product.qpm_drilling, product.qpm_taping, product.qpm_cnc_mc, product.qpm_fabrication, product.qpm_hard, product.qpm_blacodising, product.qpm_punching, product.qpm_surf_treat, product.qpm_wire_cut, product.qpm_fl_price, product.qpm_fl_qty, product.qpm_tn_price, product.qpm_tn_qty, product.qpm_ml_price, product.qpm_ml_qty, product.qpm_gd_price, product.qpm_gd_qty, product.qpm_cnc_price, product.qpm_cnc_qty, product.qpm_wire_price, product.qpm_wire_qty, product.qpm_fab_price, product.qpm_fab_qty, product.qpm_hard_price, product.qpm_hard_qty, product.qpm_bc_price, product.qpm_bc_qty, product.qpm_pc_price, product.qpm_pc_qty, product.qpm_surf_price, product.qpm_surf_qty, product.qpm_profit_per, product.qpm_id];
+        //     var singleInsertPro = 'update quotation_product_master set qpm_qty=$1, qpm_pr_no=$2, qpm_item=$3, qpm_material_code=$4, qpm_part=$5, qpm_total_cost=$6, qpm_mtm_id=$7, qpm_length=$8, qpm_width=$9, qpm_thickness=$10, qpm_raw_mat_wt=$11, qpm_rm=$12, qpm_material_cost=$13, qpm_sub_total=$14, qpm_profit=$15, qpm_cost_pc=$16, qpm_edge_length=$17, qpm_diameter=$18, qpm_grinding=$19, qpm_shape=$20, qpm_fl_cut=$21, qpm_turning=$22, qpm_milling=$23, qpm_boring=$24, qpm_drilling=$25, qpm_taping=$26, qpm_cnc_mc=$27, qpm_fabrication=$28, qpm_hard=$29, qpm_blacodising=$30, qpm_punching=$31, qpm_surf_treat=$32, qpm_wire_cut=$33, qpm_fl_price=$34, qpm_fl_qty=$35, qpm_tn_price=$36, qpm_tn_qty=$37, qpm_ml_price=$38, qpm_ml_qty=$39, qpm_gd_price=$40, qpm_gd_qty=$41, qpm_cnc_price=$42, qpm_cnc_qty=$43, qpm_wire_price=$44, qpm_wire_qty=$45, qpm_fab_price=$46, qpm_fab_qty=$47, qpm_hard_price=$48, qpm_hard_qty=$49, qpm_bc_price=$50, qpm_bc_qty=$51, qpm_pc_price=$52, qpm_pc_qty=$53, qpm_surf_price=$54, qpm_surf_qty=$55, qpm_profit_per=$56 where qpm_id = $57 RETURNING *',
+        //     paramsPro = [product.qpm_qty,product.qpm_pr_no,product.qpm_item,product.qpm_material_code,product.qpm_part,product.dtm_total_cost, product.mtm_id.mtm_id, product.qpm_length, product.qpm_width, product.qpm_thickness, product.qpm_raw_mat_wt, product.qpm_rm, product.qpm_material_cost, product.dtm_sub_total, product.dtm_profit, product.dtm_cost_pc, product.qpm_edge_length, product.qpm_diameter, product.qpm_grinding, product.qpm_shape, product.qpm_fl_cut, product.qpm_turning, product.qpm_milling, product.qpm_boring, product.qpm_drilling, product.qpm_taping, product.qpm_cnc_mc, product.qpm_fabrication, product.qpm_hard, product.qpm_blacodising, product.qpm_punching, product.qpm_surf_treat, product.qpm_wire_cut, product.qpm_fl_price, product.qpm_fl_qty, product.qpm_tn_price, product.qpm_tn_qty, product.qpm_ml_price, product.qpm_ml_qty, product.qpm_gd_price, product.qpm_gd_qty, product.qpm_cnc_price, product.qpm_cnc_qty, product.qpm_wire_price, product.qpm_wire_qty, product.qpm_fab_price, product.qpm_fab_qty, product.qpm_hard_price, product.qpm_hard_qty, product.qpm_bc_price, product.qpm_bc_qty, product.qpm_pc_price, product.qpm_pc_qty, product.qpm_surf_price, product.qpm_surf_qty, product.qpm_profit_per, product.qpm_id];
 
-            client.query(singleInsertPro, paramsPro, function (errorPro, resultPro) {
-              var borings = product.borings;
-              borings.forEach(function(value,key){
-                client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
-                  [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
-              });
+        //     client.query(singleInsertPro, paramsPro, function (errorPro, resultPro) {
+        //       var borings = product.borings;
+        //       borings.forEach(function(value,key){
+        //         client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
+        //           [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
+        //       });
 
-              var removeBorings = product.removeBorings;
-              removeBorings.forEach(function(value,key){
-                client.query("delete from quotation_product_machine_master where qpmm_id = $1",
-                  [value.qpmm_id]);
-              });
+        //       var removeBorings = product.removeBorings;
+        //       removeBorings.forEach(function(value,key){
+        //         client.query("delete from quotation_product_machine_master where qpmm_id = $1",
+        //           [value.qpmm_id]);
+        //       });
 
-              var drillings = product.drillings;
-              drillings.forEach(function(value,key){
-                client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
-                  [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
-              });
+        //       var drillings = product.drillings;
+        //       drillings.forEach(function(value,key){
+        //         client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
+        //           [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
+        //       });
 
-              var removeDrillings = product.removeDrillings;
-              removeDrillings.forEach(function(value,key){
-                client.query("delete from quotation_product_machine_master where qpmm_id = $1",
-                  [value.qpmm_id]);
-              });
+        //       var removeDrillings = product.removeDrillings;
+        //       removeDrillings.forEach(function(value,key){
+        //         client.query("delete from quotation_product_machine_master where qpmm_id = $1",
+        //           [value.qpmm_id]);
+        //       });
 
-              var tapings = product.tapings;
-              tapings.forEach(function(value,key){
-                client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
-                  [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
-              });
+        //       var tapings = product.tapings;
+        //       tapings.forEach(function(value,key){
+        //         client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
+        //           [value.qpmm_mm_id.mm_id, product.qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
+        //       });
 
-              var removeTapings = product.removeTapings;
-              removeTapings.forEach(function(value,key){
-                client.query("delete from quotation_product_machine_master where qpmm_id = $1",
-                  [value.qpmm_id]);
-              });
+        //       var removeTapings = product.removeTapings;
+        //       removeTapings.forEach(function(value,key){
+        //         client.query("delete from quotation_product_machine_master where qpmm_id = $1",
+        //           [value.qpmm_id]);
+        //       });
         
-          });
+        //   });
         
-        });
-
-        materialNewDetails.forEach(function(product, index) {
-
-
-            var singleInsertPro = 'INSERT INTO quotation_product_master(qpm_qm_id, qpm_qty, qpm_pr_no, qpm_item, qpm_material_code, qpm_part, qpm_total_cost, qpm_mtm_id, qpm_length, qpm_width, qpm_thickness, qpm_raw_mat_wt, qpm_rm, qpm_material_cost, qpm_sub_total, qpm_profit, qpm_cost_pc, qpm_edge_length, qpm_diameter, qpm_grinding, qpm_shape, qpm_fl_cut, qpm_turning, qpm_milling, qpm_boring, qpm_drilling, qpm_taping, qpm_cnc_mc, qpm_fabrication, qpm_hard, qpm_blacodising, qpm_punching, qpm_surf_treat, qpm_wire_cut, qpm_fl_price, qpm_fl_qty, qpm_tn_price, qpm_tn_qty, qpm_ml_price, qpm_ml_qty, qpm_gd_price, qpm_gd_qty, qpm_cnc_price, qpm_cnc_qty, qpm_wire_price, qpm_wire_qty, qpm_fab_price, qpm_fab_qty, qpm_hard_price, qpm_hard_qty, qpm_bc_price, qpm_bc_qty, qpm_pc_price, qpm_pc_qty, qpm_surf_price, qpm_surf_qty, qpm_profit_per) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53, $54, $55, $56, $57 ) RETURNING *',
-          paramsPro = [id,product.qpm_qty,product.qpm_pr_no,product.qpm_item,product.qpm_material_code,product.qpm_part,product.dtm_total_cost, product.mtm_id.mtm_id, product.qpm_length, product.qpm_width, product.qpm_thickness, product.qpm_raw_mat_wt, product.qpm_rm, product.qpm_material_cost, product.dtm_sub_total, product.dtm_profit, product.dtm_cost_pc, product.qpm_edge_length, product.qpm_diameter, product.qpm_grinding, product.qpm_shape, product.qpm_fl_cut, product.qpm_turning, product.qpm_milling, product.qpm_boring, product.qpm_drilling, product.qpm_taping, product.qpm_cnc_mc, product.qpm_fabrication, product.qpm_hard, product.qpm_blacodising, product.qpm_punching, product.qpm_surf_treat, product.qpm_wire_cut, product.qpm_fl_price, product.qpm_fl_qty, product.qpm_tn_price, product.qpm_tn_qty, product.qpm_ml_price, product.qpm_ml_qty, product.qpm_gd_price, product.qpm_gd_qty, product.qpm_cnc_price, product.qpm_cnc_qty, product.qpm_wire_price, product.qpm_wire_qty, product.qpm_fab_price, product.qpm_fab_qty, product.qpm_hard_price, product.qpm_hard_qty, product.qpm_bc_price, product.qpm_bc_qty, product.qpm_pc_price, product.qpm_pc_qty, product.qpm_surf_price, product.qpm_surf_qty, product.qpm_profit_per];
-
-          client.query(singleInsertPro, paramsPro, function (errorPro, resultPro) {
-              var borings = product.borings;
-              borings.forEach(function(value,key){
-                client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
-                  [value.qpmm_mm_id.mm_id, resultPro.rows[0].qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
-              });
-
-              // var removeBorings = product.removeBorings;
-              // removeBorings.forEach(function(value,key){
-              //   client.query("delete from quotation_product_machine_master where qpmm_id = $1",
-              //     [value.qpmm_id]);
-              // });
-
-              var drillings = product.drillings;
-              drillings.forEach(function(value,key){
-                client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
-                  [value.qpmm_mm_id.mm_id, resultPro.rows[0].qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
-              });
-
-              // var removeDrillings = product.removeDrillings;
-              // removeDrillings.forEach(function(value,key){
-              //   client.query("delete from quotation_product_machine_master where qpmm_id = $1",
-              //     [value.qpmm_id]);
-              // });
-
-              var tapings = product.tapings;
-              tapings.forEach(function(value,key){
-                client.query("insert into quotation_product_machine_master( qpmm_mm_id, qpmm_qpm_id, qpmm_mm_hr, qpmm_total_cost)VALUES ($1, $2, $3, $4)",
-                  [value.qpmm_mm_id.mm_id, resultPro.rows[0].qpm_id, value.qpmm_mm_hr, parseFloat(value.qpmm_mm_id.mm_price * value.qpmm_mm_hr)]);
-              });
-
-              // var removeTapings = product.removeTapings;
-              // removeTapings.forEach(function(value,key){
-              //   client.query("delete from quotation_product_machine_master where qpmm_id = $1",
-              //     [value.qpmm_id]);
-              // });
-        
-          });
-        
-        });
+        // });
 
         client.query('COMMIT;');
         done();
@@ -505,9 +458,11 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.post('/update/old', oauth.authorise(), (req, res, next) => {
+router.post('/update/old/:quotationId', oauth.authorise(), (req, res, next) => {
   const results = [];
-  const product=req.body;
+  const id = req.params.quotationId;
+  const quotation=req.body.quotation;
+  const product=req.body.update;
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -516,6 +471,10 @@ router.post('/update/old', oauth.authorise(), (req, res, next) => {
       return res.status(500).json({success: false, data: err});
     }
     client.query('BEGIN;');
+
+    var singleInsert = 'update quotation_master set  qm_total_cost=$1, qm_net_cost=$2, qm_cgst_per=$3, qm_cgst_amount=$4, qm_sgst_per=$5, qm_sgst_amount=$6, qm_igst_per=$7, qm_igst_amount=$8, qm_transport=$9, qm_other_charges=$10,  qm_discount=$11, qm_updated_at=now() where qm_id=$12 RETURNING *',
+        params = [quotation.qm_total_cost, quotation.qm_net_cost,quotation.qm_cgst_per,quotation.qm_cgst_amount,quotation.qm_sgst_per,quotation.qm_sgst_amount,quotation.qm_igst_per,quotation.qm_igst_amount,quotation.qm_transport,quotation.qm_other_charges,quotation.qm_discount, id];
+    client.query(singleInsert, params); // Will contain your inserted rows
     
     var singleInsertPro = 'update quotation_product_master set qpm_qty=$1, qpm_pr_no=$2, qpm_item=$3, qpm_material_code=$4, qpm_part=$5, qpm_total_cost=$6, qpm_mtm_id=$7, qpm_length=$8, qpm_width=$9, qpm_thickness=$10, qpm_raw_mat_wt=$11, qpm_rm=$12, qpm_material_cost=$13, qpm_sub_total=$14, qpm_profit=$15, qpm_cost_pc=$16, qpm_edge_length=$17, qpm_diameter=$18, qpm_grinding=$19, qpm_shape=$20, qpm_fl_cut=$21, qpm_turning=$22, qpm_milling=$23, qpm_boring=$24, qpm_drilling=$25, qpm_taping=$26, qpm_cnc_mc=$27, qpm_fabrication=$28, qpm_hard=$29, qpm_blacodising=$30, qpm_punching=$31, qpm_surf_treat=$32, qpm_wire_cut=$33, qpm_fl_price=$34, qpm_fl_qty=$35, qpm_tn_price=$36, qpm_tn_qty=$37, qpm_ml_price=$38, qpm_ml_qty=$39, qpm_gd_price=$40, qpm_gd_qty=$41, qpm_cnc_price=$42, qpm_cnc_qty=$43, qpm_wire_price=$44, qpm_wire_qty=$45, qpm_fab_price=$46, qpm_fab_qty=$47, qpm_hard_price=$48, qpm_hard_qty=$49, qpm_bc_price=$50, qpm_bc_qty=$51, qpm_pc_price=$52, qpm_pc_qty=$53, qpm_surf_price=$54, qpm_surf_qty=$55, qpm_profit_per=$56, qpm_updated_at=now() where qpm_id = $57 RETURNING *',
     paramsPro = [product.qpm_qty,product.qpm_pr_no,product.qpm_item,product.qpm_material_code,product.qpm_part,product.dtm_total_cost, product.mtm_id.mtm_id, product.qpm_length, product.qpm_width, product.qpm_thickness, product.qpm_raw_mat_wt, product.qpm_rm, product.qpm_material_cost, product.dtm_sub_total, product.dtm_profit, product.dtm_cost_pc, product.qpm_edge_length, product.qpm_diameter, product.qpm_grinding, product.qpm_shape, product.qpm_fl_cut, product.qpm_turning, product.qpm_milling, product.qpm_boring, product.qpm_drilling, product.qpm_taping, product.qpm_cnc_mc, product.qpm_fabrication, product.qpm_hard, product.qpm_blacodising, product.qpm_punching, product.qpm_surf_treat, product.qpm_wire_cut, product.qpm_fl_price, product.qpm_fl_qty, product.qpm_tn_price, product.qpm_tn_qty, product.qpm_ml_price, product.qpm_ml_qty, product.qpm_gd_price, product.qpm_gd_qty, product.qpm_cnc_price, product.qpm_cnc_qty, product.qpm_wire_price, product.qpm_wire_qty, product.qpm_fab_price, product.qpm_fab_qty, product.qpm_hard_price, product.qpm_hard_qty, product.qpm_bc_price, product.qpm_bc_qty, product.qpm_pc_price, product.qpm_pc_qty, product.qpm_surf_price, product.qpm_surf_qty, product.qpm_profit_per, product.qpm_id];
@@ -624,6 +583,36 @@ router.post('/update/new/:quotationId', oauth.authorise(), (req, res, next) => {
       //   client.query("delete from quotation_product_machine_master where qpmm_id = $1",
       //     [value.qpmm_id]);
       // });
+
+      client.query('COMMIT;');
+      done();
+      return res.json(results);
+    });
+    done(err);
+  });
+});
+
+router.post('/update/remove/:quotationId', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  const id = req.params.quotationId;
+  const quotation=req.body.quotation;
+  const product=req.body.delete;
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    client.query('BEGIN;');
+
+    var singleInsert = 'update quotation_master set  qm_total_cost=$1, qm_net_cost=$2, qm_cgst_per=$3, qm_cgst_amount=$4, qm_sgst_per=$5, qm_sgst_amount=$6, qm_igst_per=$7, qm_igst_amount=$8, qm_transport=$9, qm_other_charges=$10,  qm_discount=$11, qm_updated_at=now() where qm_id=$12 RETURNING *',
+        params = [quotation.qm_total_cost, quotation.qm_net_cost,quotation.qm_cgst_per,quotation.qm_cgst_amount,quotation.qm_sgst_per,quotation.qm_sgst_amount,quotation.qm_igst_per,quotation.qm_igst_amount,quotation.qm_transport,quotation.qm_other_charges,quotation.qm_discount, id];
+    client.query(singleInsert, params, function (error, result) {
+        results.push(result.rows[0]); // Will contain your inserted rows
+        
+            client.query("delete from quotation_product_master where qpm_id = $1",
+                  [product.qpm_id]);
 
       client.query('COMMIT;');
       done();
