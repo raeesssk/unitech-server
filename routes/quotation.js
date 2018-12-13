@@ -779,7 +779,6 @@ router.post('/quotation/total', oauth.authorise(), (req, res, next) => {
     }
     const str = "%"+req.body.search+"%";
 
-    console.log(str);
     const strqry =  "SELECT count(qm_id) as total "+
                     "from quotation_master qm "+
                     // "inner join design_master dm on qm.qm_dm_id=dm.dm_id "+
@@ -902,7 +901,7 @@ router.post('/approve/limit', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.post('/disapprove/total', oauth.authorise(), (req, res, next) => {
+router.post('/quotation/disapprove/total', oauth.authorise(), (req, res, next) => {
   const results = [];
   pool.connect(function(err, client, done){
     if(err) {
@@ -934,7 +933,7 @@ router.post('/disapprove/total', oauth.authorise(), (req, res, next) => {
   });
 });
 
-router.post('/disapprove/limit', oauth.authorise(), (req, res, next) => {
+router.post('/quotation/disapprove/limit', oauth.authorise(), (req, res, next) => {
   const results = [];
   pool.connect(function(err, client, done){
     if(err) {
