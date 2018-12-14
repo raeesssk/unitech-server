@@ -407,12 +407,11 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
 });
 
 router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
+
   const results = [];
   const id = req.params.quotationId;
-  const quotation=req.body.quotation;
-  const purchaseMultipleData=req.body.purchaseMultipleData;
-  const materialNewDetails = req.body.materialNewDetails;
-  const removeMaterial = req.body.removeMaterial;
+  const quotation=req.body;
+
   pool.connect(function(err, client, done){
     if(err) {
       done();
@@ -427,7 +426,7 @@ router.post('/edit/:quotationId', oauth.authorise(), (req, res, next) => {
         params = [quotation.qm_ref, quotation.qm_date, quotation.qm_total_cost, quotation.qm_net_cost,quotation.qm_cgst_per,quotation.qm_cgst_amount,quotation.qm_sgst_per,quotation.qm_sgst_amount,quotation.qm_igst_per,quotation.qm_igst_amount,quotation.qm_transport,quotation.qm_other_charges,quotation.qm_discount,quotation.qm_attend_by,quotation.qm_date_of_email, id];
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
-        
+
         // removeMaterial.forEach(function(product, index) {
         //     client.query("delete from quotation_product_master where qpm_id = $1",
         //           [product.qpm_id]);
@@ -737,6 +736,30 @@ router.post('/isapprove/:quotationId', oauth.authorise(), (req, res, next) => {
     client.query('BEGIN;');
 
     var singleInsert = "update quotation_master set qm_approve='approve', qm_updated_at=now() where qm_id=$1 RETURNING *",
+        params = [id]
+    client.query(singleInsert, params, function (error, result) {
+        results.push(result.rows[0]); // Will contain your inserted rows
+        done();
+        client.query('COMMIT;');
+        return res.json(results);
+    });
+
+    done(err);
+  });
+});
+router.post('/ispending/:quotationId', oauth.authorise(), (req, res, next) => {
+  const results = [];
+  const id = req.params.quotationId;
+  pool.connect(function(err, client, done){
+    if(err) {
+      done();
+      // pg.end();
+      console.log("the error is"+err);
+      return res.status(500).json({success: false, data: err});
+    }
+    client.query('BEGIN;');
+
+    var singleInsert = "update quotation_master set qm_approve='pending', qm_updated_at=now() where qm_id=$1 RETURNING *",
         params = [id]
     client.query(singleInsert, params, function (error, result) {
         results.push(result.rows[0]); // Will contain your inserted rows
