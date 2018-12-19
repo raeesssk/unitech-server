@@ -33,6 +33,7 @@ var sms = require('./routes/sms');
 var emailsent = require('./routes/emailsent');
 var backup = require('./routes/backup');
 var bill= require('./routes/bill');
+var finalquotation= require('./routes/finalquotation');
 
 var pmx = require('pmx').init({
   http          : true, // HTTP routes logging (default: true)
@@ -83,6 +84,7 @@ app.use('/emailsent', emailsent);
 app.use('/backup', backup);
 app.use('/user', user);
 app.use('/bill', bill);
+app.use('/finalquotation', finalquotation);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
