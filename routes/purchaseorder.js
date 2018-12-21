@@ -148,7 +148,7 @@ router.post('/add', oauth.authorise(), (req, res, next) => {
         purchaseMultipleData.forEach(function(product, index) {
 
           var singleInsertPro = 'INSERT INTO purchaseorder_product_master(popm_mtm_id, popm_pom_id, popm_shape, popm_cost, popm_quantity, popm_weight, popm_fqpm_id) values($1,$2,$3,$4,$5,$6,$7)',
-          paramsPro = [product.mtm_id,result.rows[0].pom_id,product.qpm_shape,product.qpm_material_cost,product.fqpm_quantity,product.qpm_raw_mat_wt,product.fqpm_id];
+          paramsPro = [product.mtm_id,result.rows[0].pom_id,product.qpm_shape,product.popm_cost,product.popm_quantity,product.popm_weight,product.fqpm_id];
 
           client.query(singleInsertPro, paramsPro);
           
