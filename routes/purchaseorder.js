@@ -69,8 +69,8 @@ router.get('/details/:quotationId', oauth.authorise(), (req, res, next) => {
                     "inner join material_master mtm on popm.popm_mtm_id=mtm.mtm_id "+
                     "inner join quotation_master qm on qpm.qpm_qm_id=qm.qm_id "+
                     "inner join supplier_master sm on pom.pom_sm_id=sm.sm_id "+
-                    "where pom.pom=$1 "+
-                    "order by popm asc";
+                    "where pom.pom_id=$1 "+
+                    "order by popm_id asc";
 
     const query = client.query(strqry,[id]);
     query.on('row', (row) => {
