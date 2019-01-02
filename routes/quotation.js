@@ -986,26 +986,48 @@ router.post('/product/typeahead/search', oauth.authorise(), (req, res, next) => 
     const str = "%"+req.body.search+"%";
     // SQL Query > Select Data
 
-    // const strqry =  "select distinct * from ( "+
-    //                 "select qpm.qpm_part ||' - ('||row_number() over (PARTITION BY qm.qm_id, qpm.qpm_part order by qm.qm_id, qpm.qpm_part asc)||')' as quat, "+
-    //                 "qpm.qpm_mtm_id, qpm.qpm_qty, qpm.qpm_total_cost, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, "+
-    //                 "qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, qpm.qpm_sub_total, qpm.qpm_profit, qpm.qpm_cost_pc, "+
-    //                 "qpm.qpm_edge_length, qpm.qpm_diameter, qpm.qpm_grinding, qpm.qpm_shape, qpm.qpm_fl_cut, "+
-    //                 "qpm.qpm_turning, qpm.qpm_milling, qpm.qpm_boring, qpm.qpm_drilling, qpm.qpm_taping, qpm.qpm_cnc_mc, qpm.qpm_fabrication, "+
-    //                 "qpm.qpm_hard, qpm.qpm_blacodising, qpm.qpm_punching, qpm.qpm_surf_treat, qpm.qpm_wire_cut, qpm.qpm_fl_price, qpm.qpm_fl_qty, "+
-    //                 "qpm.qpm_tn_price, qpm.qpm_tn_qty, qpm.qpm_ml_price, qpm.qpm_ml_qty, qpm.qpm_gd_price, qpm.qpm_gd_qty, qpm.qpm_cnc_price, "+
-    //                 "qpm.qpm_cnc_qty, qpm.qpm_wire_price, qpm.qpm_wire_qty, qpm.qpm_item, qpm.qpm_part, qpm.qpm_fab_price, "+
-    //                 "qpm.qpm_fab_qty, qpm.qpm_hard_price, qpm.qpm_hard_qty, qpm.qpm_bc_price, qpm.qpm_bc_qty, qpm.qpm_pc_price, qpm.qpm_pc_qty, "+
-    //                 "qpm.qpm_surf_price, qpm.qpm_surf_qty, qpm.qpm_profit_per "+
-    //                 "FROM quotation_product_master qpm "+
-    //                 "inner join quotation_master qm on qpm.qpm_qm_id = qm.qm_id "+
-    //                 "where LOWER(qpm_part) LIKE LOWER($1) ) abc"+
-    //                 "order by quat;";
-
-    const strqry =  "select qpm.qpm_vmc_price, qpm.qpm_vmc_qty, qpm.qpm_vmc_mc, qpm.qpm_image, qpm.qpm_mtm_id, qpm.qpm_id, qpm.qpm_qty, qpm.qpm_total_cost, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, qpm.qpm_sub_total, qpm.qpm_profit, qpm.qpm_cost_pc, qpm.qpm_material_code, qpm.qpm_edge_length, qpm.qpm_diameter, qpm.qpm_grinding, qpm.qpm_shape, qpm.qpm_fl_cut, qpm.qpm_turning, qpm.qpm_milling, qpm.qpm_boring, qpm.qpm_drilling, qpm.qpm_taping, qpm.qpm_cnc_mc, qpm.qpm_fabrication, qpm.qpm_hard, qpm.qpm_blacodising, qpm.qpm_punching, qpm.qpm_surf_treat, qpm.qpm_wire_cut, qpm.qpm_fl_price, qpm.qpm_fl_qty, qpm.qpm_tn_price, qpm.qpm_tn_qty, qpm.qpm_ml_price, qpm.qpm_ml_qty, qpm.qpm_gd_price, qpm.qpm_gd_qty, qpm.qpm_cnc_price, qpm.qpm_cnc_qty, qpm.qpm_wire_price, qpm.qpm_wire_qty, qpm.qpm_pr_no, qpm.qpm_item, qpm.qpm_part, qpm.qpm_part as quat, qpm.qpm_fab_price, qpm.qpm_fab_qty, qpm.qpm_hard_price, qpm.qpm_hard_qty, qpm.qpm_bc_price, qpm.qpm_bc_qty, qpm.qpm_pc_price, qpm.qpm_pc_qty, qpm.qpm_surf_price, qpm.qpm_surf_qty, qpm.qpm_profit_per, qpm.qpm_sr_no, qpm.qpm_updated_at "+
+    const strqry =  "select distinct on( "+
+                    "quat, "+
+                    "qpm.qpm_mtm_id, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, "+
+                    "qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, qpm.qpm_sub_total, qpm.qpm_profit,   qpm.qpm_cost_pc, "+
+                    "qpm.qpm_edge_length, qpm.qpm_diameter, qpm.qpm_grinding, qpm.qpm_shape, qpm.qpm_fl_cut, "+
+                    "qpm.qpm_turning, qpm.qpm_milling, qpm.qpm_boring, qpm.qpm_drilling, qpm.qpm_taping, qpm.qpm_cnc_mc, qpm.qpm_fabrication, "+
+                    "qpm.qpm_hard, qpm.qpm_blacodising, qpm.qpm_punching, qpm.qpm_surf_treat, qpm.qpm_wire_cut, qpm.qpm_fl_price, qpm.qpm_fl_qty, "+
+                    "qpm.qpm_tn_price, qpm.qpm_tn_qty, qpm.qpm_ml_price, qpm.qpm_ml_qty, qpm.qpm_gd_price, qpm.qpm_gd_qty, qpm.qpm_cnc_price, "+
+                    "qpm.qpm_cnc_qty, qpm.qpm_wire_price, qpm.qpm_wire_qty, qpm.qpm_item, qpm.qpm_part, qpm.qpm_fab_price, "+
+                    "qpm.qpm_fab_qty, qpm.qpm_hard_price, qpm.qpm_hard_qty, qpm.qpm_bc_price, qpm.qpm_bc_qty, qpm.qpm_pc_price, qpm.qpm_pc_qty, "+
+                    "qpm.qpm_surf_price, qpm.qpm_surf_qty, qpm.qpm_profit_per, qpm.qpm_vmc_price, qpm.qpm_vmc_qty, qpm.qpm_vmc_mc"+
+                    ") qpm.qpm_id, quat, "+
+                    "qpm.qpm_mtm_id, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, "+
+                    "qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, qpm.qpm_sub_total, qpm.qpm_profit,   qpm.qpm_cost_pc, "+
+                    "qpm.qpm_edge_length, qpm.qpm_diameter, qpm.qpm_grinding, qpm.qpm_shape, qpm.qpm_fl_cut, "+
+                    "qpm.qpm_turning, qpm.qpm_milling, qpm.qpm_boring, qpm.qpm_drilling, qpm.qpm_taping, qpm.qpm_cnc_mc, qpm.qpm_fabrication, "+
+                    "qpm.qpm_hard, qpm.qpm_blacodising, qpm.qpm_punching, qpm.qpm_surf_treat, qpm.qpm_wire_cut, qpm.qpm_fl_price, qpm.qpm_fl_qty, "+
+                    "qpm.qpm_tn_price, qpm.qpm_tn_qty, qpm.qpm_ml_price, qpm.qpm_ml_qty, qpm.qpm_gd_price, qpm.qpm_gd_qty, qpm.qpm_cnc_price, "+
+                    "qpm.qpm_cnc_qty, qpm.qpm_wire_price, qpm.qpm_wire_qty, qpm.qpm_item, qpm.qpm_part, qpm.qpm_fab_price, "+
+                    "qpm.qpm_fab_qty, qpm.qpm_hard_price, qpm.qpm_hard_qty, qpm.qpm_bc_price, qpm.qpm_bc_qty, qpm.qpm_pc_price, qpm.qpm_pc_qty, "+
+                    "qpm.qpm_surf_price, qpm.qpm_surf_qty, qpm.qpm_profit_per, qpm.qpm_vmc_price, qpm.qpm_vmc_qty, qpm.qpm_vmc_mc "+
+                    "from ( "+
+                    "select qpm.qpm_id, qpm.qpm_part ||' - ('||row_number() over (PARTITION BY qm.qm_id, qpm.qpm_part, qpm.qpm_id order by qm.qm_id, qpm.qpm_part, qpm.qpm_id asc)||')' as quat, "+
+                    "qpm.qpm_mtm_id, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, "+
+                    "qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, qpm.qpm_sub_total, qpm.qpm_profit,   qpm.qpm_cost_pc,"+
+                    "qpm.qpm_edge_length, qpm.qpm_diameter, qpm.qpm_grinding, qpm.qpm_shape, qpm.qpm_fl_cut, "+
+                    "qpm.qpm_turning, qpm.qpm_milling, qpm.qpm_boring, qpm.qpm_drilling, qpm.qpm_taping, qpm.qpm_cnc_mc, qpm.qpm_fabrication, "+
+                    "qpm.qpm_hard, qpm.qpm_blacodising, qpm.qpm_punching, qpm.qpm_surf_treat, qpm.qpm_wire_cut, qpm.qpm_fl_price, qpm.qpm_fl_qty, "+
+                    "qpm.qpm_tn_price, qpm.qpm_tn_qty, qpm.qpm_ml_price, qpm.qpm_ml_qty, qpm.qpm_gd_price, qpm.qpm_gd_qty, qpm.qpm_cnc_price, "+
+                    "qpm.qpm_cnc_qty, qpm.qpm_wire_price, qpm.qpm_wire_qty, qpm.qpm_item, qpm.qpm_part, qpm.qpm_fab_price, "+
+                    "qpm.qpm_fab_qty, qpm.qpm_hard_price, qpm.qpm_hard_qty, qpm.qpm_bc_price, qpm.qpm_bc_qty, qpm.qpm_pc_price, qpm.qpm_pc_qty, "+
+                    "qpm.qpm_surf_price, qpm.qpm_surf_qty, qpm.qpm_profit_per, qpm.qpm_vmc_price, qpm.qpm_vmc_qty, qpm.qpm_vmc_mc  "+
                     "FROM quotation_product_master qpm "+
+                    "inner join quotation_master qm on qpm.qpm_qm_id = qm.qm_id "+
                     "where LOWER(qpm_part) LIKE LOWER($1) "+
-                    "order by qpm.qpm_id desc LIMIT 10";
+                    "and qpm.qpm_mtm_id is not null) qpm "+
+                    "order by quat;";
+
+    // const strqry =  "select qpm.qpm_vmc_price, qpm.qpm_vmc_qty, qpm.qpm_vmc_mc, qpm.qpm_image, qpm.qpm_mtm_id, qpm.qpm_id, qpm.qpm_qty, qpm.qpm_total_cost, qpm.qpm_length, qpm.qpm_width, qpm.qpm_thickness, qpm.qpm_raw_mat_wt, qpm.qpm_rm, qpm.qpm_material_cost, qpm.qpm_sub_total, qpm.qpm_profit, qpm.qpm_cost_pc, qpm.qpm_material_code, qpm.qpm_edge_length, qpm.qpm_diameter, qpm.qpm_grinding, qpm.qpm_shape, qpm.qpm_fl_cut, qpm.qpm_turning, qpm.qpm_milling, qpm.qpm_boring, qpm.qpm_drilling, qpm.qpm_taping, qpm.qpm_cnc_mc, qpm.qpm_fabrication, qpm.qpm_hard, qpm.qpm_blacodising, qpm.qpm_punching, qpm.qpm_surf_treat, qpm.qpm_wire_cut, qpm.qpm_fl_price, qpm.qpm_fl_qty, qpm.qpm_tn_price, qpm.qpm_tn_qty, qpm.qpm_ml_price, qpm.qpm_ml_qty, qpm.qpm_gd_price, qpm.qpm_gd_qty, qpm.qpm_cnc_price, qpm.qpm_cnc_qty, qpm.qpm_wire_price, qpm.qpm_wire_qty, qpm.qpm_pr_no, qpm.qpm_item, qpm.qpm_part, qpm.qpm_part as quat, qpm.qpm_fab_price, qpm.qpm_fab_qty, qpm.qpm_hard_price, qpm.qpm_hard_qty, qpm.qpm_bc_price, qpm.qpm_bc_qty, qpm.qpm_pc_price, qpm.qpm_pc_qty, qpm.qpm_surf_price, qpm.qpm_surf_qty, qpm.qpm_profit_per, qpm.qpm_sr_no, qpm.qpm_updated_at "+
+    //                 "FROM quotation_product_master qpm "+
+    //                 "where LOWER(qpm_part) LIKE LOWER($1) "+
+    //                 "order by qpm.qpm_id desc LIMIT 10";
 
     const query = client.query(strqry,[str]);
     query.on('row', (row) => {
